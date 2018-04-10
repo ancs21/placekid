@@ -6,6 +6,8 @@ import MainMap from './MainMap'
 import { Container, Row, Col } from "reactstrap";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 
+import ListDetail from './ListDetail';
+
 import {
   Collapse,
   Navbar,
@@ -83,7 +85,7 @@ class App extends React.Component {
                 boxShadow: `0 0 20px rgba(0, 0, 0, 0.3)`
               }}
             >
-              <FormGroup>
+              {/* <FormGroup>
                 <Label for="exampleEmail">Tìm theo phường</Label>
                 <Input
                   type="text"
@@ -100,7 +102,9 @@ class App extends React.Component {
                   id="tentruong"
                   placeholder="Nhập tên trường"
                 />
-              </FormGroup>
+              </FormGroup> */}
+
+              <ListDetail />
             </Col>
             <Col sm="9" style={{ padding: 0 }}>
               <MainMap style={{}} />

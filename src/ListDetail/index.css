@@ -1,0 +1,14 @@
+.card {
+  border: none;
+  margin: -27px -15px
+}
+.card-body {
+  padding: 0 1.25rem;
+}
+.card-title {
+  margin-left: -1.25rem;
+  margin-right: -1.25rem;
+  background: #010952;
+  padding: 15px;
+  color: #fff;
+}
