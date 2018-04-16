@@ -8,26 +8,17 @@ import {
 } from "react-google-maps";
 import GGIcon from "./ggicon.svg";
 import { Container, Row, Col } from "reactstrap";
-import { Button, FormGroup, Label, Input } from "reactstrap";
+import { Button, FormGroup, Label } from "reactstrap";
 import { Typeahead } from "react-bootstrap-typeahead"; // ES2015
+import { Collapse, Form } from "reactstrap";
 
 import ListDetail from "./ListDetail";
 
-import {
-  Collapse,
-  Navbar,
-  NavbarToggler,
-  NavbarBrand,
-  Nav,
-  NavItem,
-  NavLink,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem
-} from "reactstrap";
+import { Navbar, NavbarBrand, Nav, NavItem, NavLink } from "reactstrap";
 
 import firebase from "./utils/firebase";
+const db = firebase.database();
+
 const MapComponent = compose(
   withProps({
     googleMapURL:
@@ -68,27 +59,33 @@ class App2 extends React.PureComponent {
     defaultCenter: { lat: 10.779739, lng: 106.678926 },
     onCenterChanged: {},
     center: { lat: 10.779739, lng: 106.678926 },
-    markerClicked: null
-  };
+    markerClicked: null,
 
+    collapse: false,
+
+    searchAtr: {
+      loaiTruong: "",
+      giayChungNhan: "",
+      thoiGianGiu: "",
+      hocPhi: "",
+      udoTuoiNhan: ""
+    }
+  };
+  toggle = () => {
+    this.setState({ collapse: !this.state.collapse });
+  };
   componentDidMount() {
-    const db = firebase.firestore();
-    db
-      .collection("data")
-      .limit(200)
-      .get()
-      .then(querySnapshot => {
-        let new_data = [];
-        querySnapshot.forEach(doc => {
-          // console.log(`${doc.id} => ${doc.data()}`);
-          const pos = doc.data();
-          // console.log(pos.position)
-          new_data.push(pos);
-        });
-        this.setState({
-          data: new_data
-        });
+    db.ref("data").on("value", snapshot => {
+      let new_data = [];
+      snapshot.forEach(function(childSnapshot) {
+        const childData = childSnapshot.val();
+        new_data.push(childData);
       });
+      // console.log(new_data)
+      this.setState({
+        data: new_data
+      });
+    });
   }
   handleMarkerClick = marker => {
     // console.log(marker);
@@ -102,7 +99,52 @@ class App2 extends React.PureComponent {
       center: { lat: 10.7882937, lng: 106.6946765 }
     });
   };
+  handleSubmit = e => {
+    e.preventDefault();
+    const { searchAtr, data } = this.state;
+    db
+      .ref("data")
+      .once("value")
+      .then(snapshot => {
+        let new_data = [];
+        snapshot.forEach(function(childSnapshot) {
+          const childData = childSnapshot.val();
+          new_data.push(childData);
+        });
+        // console.log(new_data)
+        this.setState({
+          data: new_data
+        });
+      })
+      .then(() => {
+        this.setState({
+          data: data.filter(v => {
+            if (searchAtr["loaiTruong"] === "") {
+              return v;
+            } else {
+              return v.loaiTruong === this.state.searchAtr["loaiTruong"];
+            }
+          })
+        });
+      });
+  };
   render() {
+    const { data, searchAtr } = this.state;
+    const uLoaiTruong = [
+      ...new Set(data.map(i => i.loaiTruong).filter(v => v !== "undefined"))
+    ];
+    const ugiayChungNhan = [
+      ...new Set(data.map(i => i.giayChungNhan).filter(v => v !== "undefined"))
+    ];
+    const uhocPhi = [
+      ...new Set(data.map(i => i.hocPhi).filter(v => v !== "undefined"))
+    ];
+    const udoTuoiNhan = [
+      ...new Set(data.map(i => i.doTuoiNhan).filter(v => v !== "undefined"))
+    ];
+    const uthoiGianGiu = [
+      ...new Set(data.map(i => i.thoiGianGiu).filter(v => v !== "undefined"))
+    ];
     return (
       <div>
         <Navbar
@@ -189,12 +231,6 @@ class App2 extends React.PureComponent {
                       selected={this.state.selected}
                     />
                   </FormGroup>
-                  {/* <Input
-                      type="text"
-                      name="text"
-                      id="phuong"
-                      placeholder="Nhập địa chỉ phường"
-                    /> */}
                   <FormGroup>
                     <Label for="phuong">Tìm theo trường</Label>
                     <Typeahead
@@ -216,15 +252,124 @@ class App2 extends React.PureComponent {
                       selected={this.state.selected}
                     />
                   </FormGroup>
-                  {/* <FormGroup>
-                    <Label for="tentruong">Tìm kiếm tên trường</Label>
-                    <Input
-                      type="text"
-                      name="text"
-                      id="tentruong"
-                      placeholder="Nhập tên trường"
-                    />
-                  </FormGroup> */}
+                  <Button
+                    outline
+                    onClick={this.toggle}
+                    style={{ marginBottom: "1rem" }}
+                  >
+                    Tìm kiếm theo thuộc tính
+                  </Button>
+                  <Collapse isOpen={this.state.collapse}>
+                    <Form onSubmit={this.handleSubmit}>
+                      <FormGroup>
+                        <Label for="loaiTruong">Loại trường</Label>
+                        <Typeahead
+                          paginationText="Xem thêm"
+                          emptyLabel="Không có dữ liệu"
+                          onChange={selected => {
+                            if (selected.length !== 0) {
+                              this.setState(prevState => ({
+                                searchAtr: {
+                                  ...prevState.searchAtr,
+                                  loaiTruong: selected[0]
+                                }
+                              }));
+                            } else {
+                              this.setState(prevState => ({
+                                searchAtr: {
+                                  ...prevState.searchAtr,
+                                  loaiTruong: ""
+                                }
+                              }));
+                            }
+                          }}
+                          options={uLoaiTruong}
+                          selected={this.state.selected}
+                        />
+                      </FormGroup>
+
+                      <FormGroup>
+                        <Label for="gcn">Giấy chứng nhận</Label>
+                        <Typeahead
+                          paginationText="Xem thêm"
+                          emptyLabel="Không có dữ liệu"
+                          onChange={selected => {
+                            if (selected.length !== 0) {
+                              this.setState(prevState => ({
+                                searchAtr: {
+                                  ...prevState.searchAtr,
+                                  giayChungNhan: selected[0]
+                                }
+                              }));
+                            }
+                          }}
+                          options={ugiayChungNhan}
+                          selected={this.state.selected}
+                        />
+                      </FormGroup>
+
+                      <FormGroup>
+                        <Label for="hp">Học phí</Label>
+                        <Typeahead
+                          paginationText="Xem thêm"
+                          emptyLabel="Không có dữ liệu"
+                          onChange={selected => {
+                            if (selected.length !== 0) {
+                              this.setState(prevState => ({
+                                searchAtr: {
+                                  ...prevState.searchAtr,
+                                  hocPhi: selected[0]
+                                }
+                              }));
+                            }
+                          }}
+                          options={uhocPhi}
+                          selected={this.state.selected}
+                        />
+                      </FormGroup>
+
+                      <FormGroup>
+                        <Label for="dt">Độ tuổi trẻ nhận giữ</Label>
+                        <Typeahead
+                          paginationText="Xem thêm"
+                          emptyLabel="Không có dữ liệu"
+                          onChange={selected => {
+                            if (selected.length !== 0) {
+                              this.setState(prevState => ({
+                                searchAtr: {
+                                  ...prevState.searchAtr,
+                                  doTuoiNhan: selected[0]
+                                }
+                              }));
+                            }
+                          }}
+                          options={udoTuoiNhan}
+                          selected={this.state.selected}
+                        />
+                      </FormGroup>
+
+                      <FormGroup>
+                        <Label for="tg">Thời gian nhận giữ trẻ</Label>
+                        <Typeahead
+                          paginationText="Xem thêm"
+                          emptyLabel="Không có dữ liệu"
+                          onChange={selected => {
+                            if (selected.length !== 0) {
+                              this.setState(prevState => ({
+                                searchAtr: {
+                                  ...prevState.searchAtr,
+                                  thoiGianGiu: selected[0]
+                                }
+                              }));
+                            }
+                          }}
+                          options={uthoiGianGiu}
+                          selected={this.state.selected}
+                        />
+                      </FormGroup>
+                      <Button color="primary">Tìm kiếm</Button>
+                    </Form>
+                  </Collapse>
                 </div>
               )}
             </Col>

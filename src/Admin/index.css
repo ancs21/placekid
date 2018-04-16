@@ -1,0 +1,12 @@
+table {
+  table-layout: auto;
+  display: block;
+  width: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+  white-space: nowrap !important;
+}
+.table-view {
+  font-size: 14px
+}

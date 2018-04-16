@@ -1,12 +1,10 @@
 import React from "react";
-import { ListGroup, ListGroupItem } from "reactstrap";
 import {
   Card,
   CardImg,
   CardText,
   CardBody,
   CardTitle,
-  CardSubtitle,
   Button
 } from "reactstrap";
 import "./index.css";
