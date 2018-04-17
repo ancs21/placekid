@@ -1,3 +1,5 @@
+
+
 table {
   table-layout: auto;
   display: block;
@@ -6,7 +8,15 @@ table {
   -webkit-overflow-scrolling: touch;
   -ms-overflow-style: -ms-autohiding-scrollbar;
   white-space: nowrap !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
 }
 .table-view {
-  font-size: 14px
+  margin-top: 30px;
+  font-size: 14px;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  border-radius: 3px;
 }

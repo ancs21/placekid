@@ -97,7 +97,7 @@ export default class ListDetail extends React.Component {
           </CardText>
 
           {datamarker.loaiTruong !== "undefined" ? (
-            datamarker.loaiTruong !== "Dân Lập" ? (
+            datamarker.loaiTruong === "Dân Lập" ? (
               <Button style={{ marginBottom: 30 }} outline color="info">
                 Nhận tuyển sinh theo nhu cầu
               </Button>

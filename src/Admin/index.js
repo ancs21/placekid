@@ -1,12 +1,12 @@
-import React from "react";
-import BootstrapTable from "react-bootstrap-table-next";
-import paginationFactory from "react-bootstrap-table2-paginator";
+import React from 'react';
+import BootstrapTable from 'react-bootstrap-table-next';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 
-import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
-import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
 
-import "./index.css";
-import firebase from "../utils/firebase";
+import './index.css';
+import firebase from '../utils/firebase';
 
 import {
   Navbar,
@@ -18,9 +18,9 @@ import {
   Container,
   Row,
   Col
-} from "reactstrap";
+} from 'reactstrap';
 
-import ModalForm from "./ModalForm";
+import ModalForm from './ModalForm';
 
 class AdminPage extends React.Component {
   state = {
@@ -31,13 +31,13 @@ class AdminPage extends React.Component {
   componentWillMount() {
     const db = firebase.database();
     db
-      .ref("data")
-      .once("value")
+      .ref('data')
+      .once('value')
       .then(snapshot => {
         let new_data = [];
         snapshot.forEach(childSnapshot => {
           const childData = childSnapshot.val();
-          childData["key"] = childSnapshot.key;
+          childData['key'] = childSnapshot.key;
           new_data.push(childData);
         });
         // console.log(new_data)
@@ -58,131 +58,131 @@ class AdminPage extends React.Component {
   render() {
     const columns = [
       {
-        dataField: "soThuTu",
-        text: "STT"
+        dataField: 'soThuTu',
+        text: 'STT'
       },
       {
-        dataField: "tenTruong",
-        text: "Tên trường"
+        dataField: 'tenTruong',
+        text: 'Tên trường'
       },
       {
         dataField: `position.lat`,
-        text: "Latitude"
+        text: 'Latitude'
       },
       {
         dataField: `position.lng`,
-        text: "Longtitude"
+        text: 'Longtitude'
       },
       {
-        dataField: "diaChi",
-        text: "Địa chỉ"
+        dataField: 'diaChi',
+        text: 'Địa chỉ'
       },
       {
-        dataField: "phuong",
-        text: "Phường"
+        dataField: 'phuong',
+        text: 'Phường'
       },
 
       {
-        dataField: "quan",
-        text: "Quận"
+        dataField: 'quan',
+        text: 'Quận'
       },
       {
-        dataField: "thanhPho",
-        text: "Thành Phố"
+        dataField: 'thanhPho',
+        text: 'Thành Phố'
       },
       {
-        dataField: "phone",
-        text: "SĐT"
+        dataField: 'phone',
+        text: 'SĐT'
       },
       {
-        dataField: "website",
-        text: "Web Site"
+        dataField: 'website',
+        text: 'Web Site'
       },
       {
-        dataField: "loaiTruong",
-        text: "Loại trường"
+        dataField: 'loaiTruong',
+        text: 'Loại trường'
       },
       {
-        dataField: "giayChungNhan",
-        text: "Giấy chứng nhận"
+        dataField: 'giayChungNhan',
+        text: 'Giấy chứng nhận'
       },
       {
-        dataField: "cosSoVatChat",
-        text: "Cơ sở vật chất"
+        dataField: 'cosSoVatChat',
+        text: 'Cơ sở vật chất'
       },
       {
-        dataField: "nhanLuc",
-        text: "Nhân lực"
+        dataField: 'nhanLuc',
+        text: 'Nhân lực'
       },
       {
-        dataField: "chuongTrinhGiangDay",
-        text: "Chương trình dạy"
+        dataField: 'chuongTrinhGiangDay',
+        text: 'Chương trình dạy'
       },
       {
-        dataField: "hocPhi",
-        text: "Học phí"
+        dataField: 'hocPhi',
+        text: 'Học phí'
       },
       {
-        dataField: "doTuoiNhan",
-        text: "Độ tuổi trẻ nhận giữ"
+        dataField: 'doTuoiNhan',
+        text: 'Độ tuổi trẻ nhận giữ'
       },
       {
-        dataField: "thoiGianGiu",
-        text: "Thời gian nhận giữ trẻ"
+        dataField: 'thoiGianGiu',
+        text: 'Thời gian nhận giữ trẻ'
       },
       {
-        dataField: "khac",
-        text: "Khác"
+        dataField: 'khac',
+        text: 'Khác'
       }
     ];
     const rowEvents = {
       onClick: (e, row, rowIndex) => {
-        console.log(row);
+        // console.log(row);
         this.toggle(row);
       }
     };
     return (
-      <div>
+      <div style={{ background: '#f5f7fb', height: '100vh' }}>
         <Navbar
           style={{
-            background: "#3F3E3A",
+            background: '#3F3E3A',
             height: 64,
             boxShadow: `0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)`
           }}
           light
           expand="md"
         >
-          <NavbarBrand href="/" style={{ color: "#fff" }}>
+          <NavbarBrand href="/" style={{ color: '#fff' }}>
             {/* <img src={logo} height="59" alt="" /> */}
             Admin Page
           </NavbarBrand>
-          <Nav className="ml-auto" style={{ alignItems: "center" }} navbar>
+          <Nav className="ml-auto" style={{ alignItems: 'center' }} navbar>
             <NavItem>
               <NavLink
                 href="#"
                 style={{
-                  color: "#ffffff"
+                  color: '#ffffff'
                 }}
               >
                 Quản lý vị trí
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href="#" style={{ color: "#ffffff" }}>
+              <NavLink href="#" style={{ color: '#ffffff' }}>
                 Quản lý người dùng
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href="#" style={{ color: "#ffffff" }}>
+              <NavLink href="#" style={{ color: '#ffffff' }}>
                 <Button
                   style={{
-                    color: "#444",
-                    background: "#fff",
+                    color: '#444',
+                    background: '#fff',
                     boxShadow: ` 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)`
                   }}
                 >
                   <img src="#" height="22" alt="" />
-                  {"   "}Đăng nhập với Google
+                  {'   '}Đăng nhập với Google
                 </Button>
               </NavLink>
             </NavItem>

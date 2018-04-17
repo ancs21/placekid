@@ -1,28 +1,26 @@
-import React from "react";
-import { compose, withProps } from "recompose";
+import React from 'react';
+import { compose, withProps } from 'recompose';
 import {
   withScriptjs,
   withGoogleMap,
   GoogleMap,
   Marker
-} from "react-google-maps";
-import GGIcon from "./ggicon.svg";
-import { Container, Row, Col } from "reactstrap";
-import { Button, FormGroup, Label } from "reactstrap";
-import { Typeahead } from "react-bootstrap-typeahead"; // ES2015
-import { Collapse, Form } from "reactstrap";
+} from 'react-google-maps';
+import { Container, Row, Col } from 'reactstrap';
+import { Button, FormGroup, Label } from 'reactstrap';
+import { Typeahead } from 'react-bootstrap-typeahead'; // ES2015
+import { Collapse, Form } from 'reactstrap';
 
-import ListDetail from "./ListDetail";
+import ListDetail from './ListDetail';
 
-import { Navbar, NavbarBrand, Nav, NavItem, NavLink } from "reactstrap";
-
-import firebase from "./utils/firebase";
+import Header from './Header';
+import firebase from './utils/firebase';
 const db = firebase.database();
 
 const MapComponent = compose(
   withProps({
     googleMapURL:
-      "https://maps.googleapis.com/maps/api/js?key=AIzaSyCeNHOAwZYe401o8yWdDyK45FKwOjsS-w8&v=3.exp&libraries=geometry,drawing,places",
+      'https://maps.googleapis.com/maps/api/js?key=AIzaSyCeNHOAwZYe401o8yWdDyK45FKwOjsS-w8&v=3.exp&libraries=geometry,drawing,places',
     loadingElement: <div style={{ height: `100vh` }} />,
     containerElement: <div style={{ height: `100vh` }} />,
     mapElement: <div style={{ height: `100vh` }} />
@@ -60,28 +58,25 @@ class App2 extends React.PureComponent {
     onCenterChanged: {},
     center: { lat: 10.779739, lng: 106.678926 },
     markerClicked: null,
-    collapse: false,
+    collapse: false
   };
   toggle = () => {
     this.setState({ collapse: !this.state.collapse });
   };
   componentDidMount() {
-    db.ref("data").on("value", snapshot => {
+    db.ref('data').on('value', snapshot => {
       let new_data = [];
       snapshot.forEach(function(childSnapshot) {
         const childData = childSnapshot.val();
         new_data.push(childData);
       });
-      // console.log(new_data)
       this.setState({
         data: new_data
       });
     });
   }
   handleMarkerClick = marker => {
-    // console.log(marker);
     this.setState({ showDetail: true, markerClicked: marker });
-    // this.delayedShowMarker();
   };
 
   onZoomChanged = () => {
@@ -90,6 +85,7 @@ class App2 extends React.PureComponent {
       center: { lat: 10.7882937, lng: 106.6946765 }
     });
   };
+
   handleSubmit = e => {
     e.preventDefault();
     this.refs.typeahead1.getInstance().clear();
@@ -99,15 +95,14 @@ class App2 extends React.PureComponent {
     this.refs.typeahead5.getInstance().clear();
     const { searchAtr, data } = this.state;
     db
-      .ref("data")
-      .once("value")
+      .ref('data')
+      .once('value')
       .then(snapshot => {
         let new_data = [];
-        snapshot.forEach(function(childSnapshot) {
-          const childData = childSnapshot.val();
+        snapshot.forEach(csnap => {
+          const childData = csnap.val();
           new_data.push(childData);
         });
-        // console.log(new_data)
         this.setState({
           data: new_data
         });
@@ -116,81 +111,27 @@ class App2 extends React.PureComponent {
   render() {
     const { data } = this.state;
     const uLoaiTruong = [
-      ...new Set(data.map(i => i.loaiTruong).filter(v => v !== "undefined"))
+      ...new Set(data.map(i => i.loaiTruong).filter(v => v !== 'undefined'))
     ];
     const ugiayChungNhan = [
-      ...new Set(data.map(i => i.giayChungNhan).filter(v => v !== "undefined"))
+      ...new Set(data.map(i => i.giayChungNhan).filter(v => v !== 'undefined'))
     ];
     const uhocPhi = [
-      ...new Set(data.map(i => i.hocPhi).filter(v => v !== "undefined"))
+      ...new Set(data.map(i => i.hocPhi).filter(v => v !== 'undefined'))
     ];
     const udoTuoiNhan = [
-      ...new Set(data.map(i => i.doTuoiNhan).filter(v => v !== "undefined"))
+      ...new Set(data.map(i => i.doTuoiNhan).filter(v => v !== 'undefined'))
     ];
     const uthoiGianGiu = [
-      ...new Set(data.map(i => i.thoiGianGiu).filter(v => v !== "undefined"))
+      ...new Set(data.map(i => i.thoiGianGiu).filter(v => v !== 'undefined'))
     ];
     return (
       <div>
-        <Navbar
-          fixed="top"
-          style={{
-            background: "#3F3E3A",
-            height: 64,
-            boxShadow: `0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)`
-          }}
-          light
-          expand="md"
-        >
-          <NavbarBrand href="/" style={{ color: "#fff" }}>
-            {/* <img src={logo} height="59" alt="" /> */}
-            Mầm non cho bé
-          </NavbarBrand>
-          <Nav className="ml-auto" style={{ alignItems: "center" }} navbar>
-            <NavItem>
-              <NavLink
-                href="#"
-                style={{
-                  color: "#ffffff"
-                }}
-              >
-                Trang chủ
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="#" style={{ color: "#ffffff" }}>
-                Hướng dẫn
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="#" style={{ color: "#ffffff" }}>
-                <Button
-                  style={{
-                    color: "#444",
-                    background: "#fff",
-                    boxShadow: ` 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)`
-                  }}
-                >
-                  <img src={GGIcon} height="22" alt="" />
-                  {"   "}Đăng nhập với Google
-                </Button>
-              </NavLink>
-            </NavItem>
-          </Nav>
-        </Navbar>
+        <Header />
 
         <Container fluid>
           <Row>
-            <Col
-              sm="4"
-              style={{
-                zIndex: 1,
-                paddingTop: 90,
-                boxShadow: `0 0 20px rgba(0, 0, 0, 0.3)`,
-                overflowY: "auto",
-                height: "100vh"
-              }}
-            >
+            <Col sm="4" className="sidebar">
               {this.state.showDetail ? (
                 <ListDetail marker={this.state.markerClicked} />
               ) : (
@@ -203,8 +144,6 @@ class App2 extends React.PureComponent {
                       paginationText="Xem thêm"
                       emptyLabel="Không có dữ liệu"
                       onChange={selected => {
-                        console.log(selected);
-                        // let pos = ;
                         if (selected.length !== 0) {
                           this.setState({
                             zoom: 16,
@@ -240,7 +179,7 @@ class App2 extends React.PureComponent {
                   <Button
                     outline
                     onClick={this.toggle}
-                    style={{ marginBottom: "1rem" }}
+                    style={{ marginBottom: '1rem' }}
                   >
                     Tìm kiếm theo thuộc tính
                   </Button>
@@ -275,12 +214,6 @@ class App2 extends React.PureComponent {
                           emptyLabel="Không có dữ liệu"
                           onChange={selected => {
                             if (selected.length !== 0) {
-                              // this.setState(prevState => ({
-                              //   searchAtr: {
-                              //     ...prevState.searchAtr,
-                              //     giayChungNhan: selected[0]
-                              //   }
-                              // }));
                               const newData = data.filter(
                                 v => v.giayChungNhan === selected[0]
                               );
@@ -356,12 +289,13 @@ class App2 extends React.PureComponent {
                           selected={this.state.selected}
                         />
                       </FormGroup>
-                      <Button color="primary">Tìm lại</Button>
+                      <Button style={{marginBottom: 25}} color="primary">Tìm lại</Button>
                     </Form>
                   </Collapse>
                 </div>
               )}
             </Col>
+
             <Col sm="8" style={{ padding: 0 }}>
               <MapComponent
                 zoom={this.state.zoom}
