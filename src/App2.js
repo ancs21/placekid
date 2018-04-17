@@ -60,16 +60,7 @@ class App2 extends React.PureComponent {
     onCenterChanged: {},
     center: { lat: 10.779739, lng: 106.678926 },
     markerClicked: null,
-
     collapse: false,
-
-    searchAtr: {
-      loaiTruong: "",
-      giayChungNhan: "",
-      thoiGianGiu: "",
-      hocPhi: "",
-      udoTuoiNhan: ""
-    }
   };
   toggle = () => {
     this.setState({ collapse: !this.state.collapse });
@@ -101,6 +92,11 @@ class App2 extends React.PureComponent {
   };
   handleSubmit = e => {
     e.preventDefault();
+    this.refs.typeahead1.getInstance().clear();
+    this.refs.typeahead2.getInstance().clear();
+    this.refs.typeahead3.getInstance().clear();
+    this.refs.typeahead4.getInstance().clear();
+    this.refs.typeahead5.getInstance().clear();
     const { searchAtr, data } = this.state;
     db
       .ref("data")
@@ -115,21 +111,10 @@ class App2 extends React.PureComponent {
         this.setState({
           data: new_data
         });
-      })
-      .then(() => {
-        this.setState({
-          data: data.filter(v => {
-            if (searchAtr["loaiTruong"] === "") {
-              return v;
-            } else {
-              return v.loaiTruong === this.state.searchAtr["loaiTruong"];
-            }
-          })
-        });
       });
   };
   render() {
-    const { data, searchAtr } = this.state;
+    const { data } = this.state;
     const uLoaiTruong = [
       ...new Set(data.map(i => i.loaiTruong).filter(v => v !== "undefined"))
     ];
@@ -264,23 +249,17 @@ class App2 extends React.PureComponent {
                       <FormGroup>
                         <Label for="loaiTruong">Loại trường</Label>
                         <Typeahead
+                          ref="typeahead1"
                           paginationText="Xem thêm"
                           emptyLabel="Không có dữ liệu"
                           onChange={selected => {
                             if (selected.length !== 0) {
-                              this.setState(prevState => ({
-                                searchAtr: {
-                                  ...prevState.searchAtr,
-                                  loaiTruong: selected[0]
-                                }
-                              }));
-                            } else {
-                              this.setState(prevState => ({
-                                searchAtr: {
-                                  ...prevState.searchAtr,
-                                  loaiTruong: ""
-                                }
-                              }));
+                              const newData = data.filter(
+                                v => v.loaiTruong === selected[0]
+                              );
+                              this.setState({
+                                data: newData
+                              });
                             }
                           }}
                           options={uLoaiTruong}
@@ -291,16 +270,23 @@ class App2 extends React.PureComponent {
                       <FormGroup>
                         <Label for="gcn">Giấy chứng nhận</Label>
                         <Typeahead
+                          ref="typeahead2"
                           paginationText="Xem thêm"
                           emptyLabel="Không có dữ liệu"
                           onChange={selected => {
                             if (selected.length !== 0) {
-                              this.setState(prevState => ({
-                                searchAtr: {
-                                  ...prevState.searchAtr,
-                                  giayChungNhan: selected[0]
-                                }
-                              }));
+                              // this.setState(prevState => ({
+                              //   searchAtr: {
+                              //     ...prevState.searchAtr,
+                              //     giayChungNhan: selected[0]
+                              //   }
+                              // }));
+                              const newData = data.filter(
+                                v => v.giayChungNhan === selected[0]
+                              );
+                              this.setState({
+                                data: newData
+                              });
                             }
                           }}
                           options={ugiayChungNhan}
@@ -311,16 +297,17 @@ class App2 extends React.PureComponent {
                       <FormGroup>
                         <Label for="hp">Học phí</Label>
                         <Typeahead
+                          ref="typeahead3"
                           paginationText="Xem thêm"
                           emptyLabel="Không có dữ liệu"
                           onChange={selected => {
                             if (selected.length !== 0) {
-                              this.setState(prevState => ({
-                                searchAtr: {
-                                  ...prevState.searchAtr,
-                                  hocPhi: selected[0]
-                                }
-                              }));
+                              const newData = data.filter(
+                                v => v.hocPhi === selected[0]
+                              );
+                              this.setState({
+                                data: newData
+                              });
                             }
                           }}
                           options={uhocPhi}
@@ -331,16 +318,17 @@ class App2 extends React.PureComponent {
                       <FormGroup>
                         <Label for="dt">Độ tuổi trẻ nhận giữ</Label>
                         <Typeahead
+                          ref="typeahead4"
                           paginationText="Xem thêm"
                           emptyLabel="Không có dữ liệu"
                           onChange={selected => {
                             if (selected.length !== 0) {
-                              this.setState(prevState => ({
-                                searchAtr: {
-                                  ...prevState.searchAtr,
-                                  doTuoiNhan: selected[0]
-                                }
-                              }));
+                              const newData = data.filter(
+                                v => v.doTuoiNhan === selected[0]
+                              );
+                              this.setState({
+                                data: newData
+                              });
                             }
                           }}
                           options={udoTuoiNhan}
@@ -351,23 +339,24 @@ class App2 extends React.PureComponent {
                       <FormGroup>
                         <Label for="tg">Thời gian nhận giữ trẻ</Label>
                         <Typeahead
+                          ref="typeahead5"
                           paginationText="Xem thêm"
                           emptyLabel="Không có dữ liệu"
                           onChange={selected => {
                             if (selected.length !== 0) {
-                              this.setState(prevState => ({
-                                searchAtr: {
-                                  ...prevState.searchAtr,
-                                  thoiGianGiu: selected[0]
-                                }
-                              }));
+                              const newData = data.filter(
+                                v => v.thoiGianGiu === selected[0]
+                              );
+                              this.setState({
+                                data: newData
+                              });
                             }
                           }}
                           options={uthoiGianGiu}
                           selected={this.state.selected}
                         />
                       </FormGroup>
-                      <Button color="primary">Tìm kiếm</Button>
+                      <Button color="primary">Tìm lại</Button>
                     </Form>
                   </Collapse>
                 </div>
