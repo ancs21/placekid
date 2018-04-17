@@ -50,6 +50,8 @@ class ModalForm extends React.Component {
     });
   };
 
+  
+
   handleChange1 = (e) => {
     let lat = e.target.value
     let poslat = this.state.v.position;
@@ -62,6 +64,13 @@ class ModalForm extends React.Component {
 
   handleSubmit = (e) => {
     // console.log(this.state.v.key)
+    setTimeout(() => {
+      if(this.state.update) {
+        this.setState({
+          update: !this.state.update
+        })
+      }
+    }, 3000);
     e.preventDefault();
     db.ref(`data/${this.state.v.key}`).update(this.state.v)
     .then(result => this.setState({update: true}))
@@ -301,7 +310,7 @@ class ModalForm extends React.Component {
             
           </ModalBody>
           <ModalFooter>
-            {(this.state.update && this.props.modal) && <div>Cập nhật thành công</div> }
+            {(this.state.update) && <div>Cập nhật thành công</div> }
             <Button color="primary" onClick={this.toggle}>
               Submit
             </Button>
