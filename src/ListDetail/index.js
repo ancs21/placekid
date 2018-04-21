@@ -28,7 +28,7 @@ export default class ListDetail extends React.Component {
               right: "2%"
             }}
           >
-            <Button>Lưu</Button> <Button>Chỉ đường</Button>
+            <Button>Chỉ đường</Button>
           </div>
           <CardTitle>
             {datamarker.tenTruong !== "undefined" ? datamarker.tenTruong : null}

@@ -5844,6 +5844,10 @@ react-bootstrap-table-next@^0.1.7:
   dependencies:
     classnames "2.2.5"
 
+react-bootstrap-table2-filter@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/react-bootstrap-table2-filter/-/react-bootstrap-table2-filter-0.1.6.tgz#01af56627cc7782fea44f6162ed490d7256d90eb"
+
 react-bootstrap-table2-paginator@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/react-bootstrap-table2-paginator/-/react-bootstrap-table2-paginator-0.1.1.tgz#cb28874a86dc45d8e6673e092e8eb2692615bbc9"

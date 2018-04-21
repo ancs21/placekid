@@ -5,44 +5,16 @@ import firebase from '../utils/firebase';
 const db = firebase.database();
 
 class ModalForm extends React.Component {
-  state = { v: null, update: false };
+  state = { v: null, update: false, delete: false };
 
   static getDerivedStateFromProps(nextProps, prevState) {
     // do things with nextProps.someProp and prevState.cachedSomeProp
     return {
-      v: nextProps.value,
+      v: nextProps.value
     };
   }
 
   handleChange = e => {
-    let data = {
-      chuongTrinhGiangDay: e.target.value,
-      coSoVatChat: e.target.value,
-      diaChi: e.target.value,
-      diaChiKhuVuc: e.target.value,
-      doTuoiNhan: e.target.value,
-      fullAddressByGoogle: e.target.value,
-      fullAddressByHand: e.target.value,
-      giayChungNhan: e.target.value,
-      hinhAnh: e.target.value,
-      hocPhi: e.target.value,
-      key: '-LAI9iq8Bvdm26ekN_bT',
-      khac: e.target.value,
-      loaiTruong: e.target.value,
-      nhanLuc: e.target.value,
-      phone: e.target.value,
-      phuong: e.target.value,
-      position: {
-        lat: e.target.value,
-        lng: e.target.value
-      },
-      quan: e.target.value,
-      soThuTu: e.target.value,
-      tenTruong: e.target.value,
-      thanhPho: e.target.value,
-      thoiGianGiu: e.target.value,
-      website: e.target.value
-    };
     const v = this.state.v;
     v[e.target.name] = e.target.value;
     this.setState({
@@ -50,32 +22,36 @@ class ModalForm extends React.Component {
     });
   };
 
-  
-
-  handleChange1 = (e) => {
-    let lat = e.target.value
-    let poslat = this.state.v.position;
-    poslat['lat'] = e.target.value
-    console.log(poslat)
-    this.setState({
-
-    })
-  }
-
-  handleSubmit = (e) => {
-    // console.log(this.state.v.key)
+  handleSubmit = e => {
     setTimeout(() => {
-      if(this.state.update) {
+      if (this.state.update) {
         this.setState({
           update: !this.state.update
-        })
+        });
       }
     }, 3000);
     e.preventDefault();
-    db.ref(`data/${this.state.v.key}`).update(this.state.v)
-    .then(result => this.setState({update: true}))
-    .catch(err => console.log(err))
-  }
+    db
+      .ref(`data/${this.state.v.key}`)
+      .update(this.state.v)
+      .then(result => this.setState({ update: true }))
+      .catch(err => console.log(err));
+  };
+
+  removeData = () => {
+    setTimeout(() => {
+      if (this.state.delete) {
+        this.setState({
+          delete: !this.state.delete
+        });
+      }
+    }, 10000);
+    db
+      .ref(`data/${this.state.v.key}`)
+      .remove()
+      .then(() => this.setState({ delete: true }))
+      .catch(err => console.log(err));
+  };
   render() {
     const { modal, toggle, value, className } = this.props;
     const { v } = this.state;
@@ -88,10 +64,24 @@ class ModalForm extends React.Component {
           value={value}
           className={className}
         >
-          <ModalHeader toggle={this.toggle}>Cập nhật dữ liệu</ModalHeader>
+          <ModalHeader toggle={this.toggle}>
+            Cập nhật dữ liệu{' '}
+            <Button
+              color="danger"
+              style={{ marginLeft: 50 }}
+              onClick={this.removeData}
+            >
+              Xóa
+            </Button>
+            {this.state.delete && (
+              <div style={{fontSize: '14px'}}>
+                Xoá thành công! Lưu ý: Bạn cần tải lại trang mới thấy sự thay
+                đổi
+              </div>
+            )}
+          </ModalHeader>
           <Form onSubmit={this.handleSubmit}>
-          <ModalBody>
-           
+            <ModalBody>
               <FormGroup row>
                 <Label sm={3}>Tên trường</Label>
                 <Col sm={9}>
@@ -104,11 +94,11 @@ class ModalForm extends React.Component {
                 </Col>
               </FormGroup>
 
-              {/* <FormGroup row>
+              <FormGroup row>
                 <Label sm={3}>Latitude</Label>
                 <Col sm={9}>
                   <Input
-                    value=""
+                    value={v.lat}
                     onChange={this.handleChange1}
                     type="text"
                     name="lat"
@@ -120,13 +110,13 @@ class ModalForm extends React.Component {
                 <Label sm={3}>Longtitude</Label>
                 <Col sm={9}>
                   <Input
-                    value={v.position}
+                    value={v.lng}
                     onChange={this.handleChange}
                     type="text"
                     name="lng"
                   />
                 </Col>
-              </FormGroup> */}
+              </FormGroup>
 
               <FormGroup row>
                 <Label sm={3}>Địa chỉ</Label>
@@ -307,14 +297,13 @@ class ModalForm extends React.Component {
                   />
                 </Col>
               </FormGroup>
-            
-          </ModalBody>
-          <ModalFooter>
-            {(this.state.update) && <div>Cập nhật thành công</div> }
-            <Button color="primary" onClick={this.toggle}>
-              Submit
-            </Button>
-          </ModalFooter>
+            </ModalBody>
+            <ModalFooter>
+              {this.state.update && <div>Cập nhật thành công</div>}
+              <Button color="primary" onClick={this.toggle}>
+                Cập nhật
+              </Button>
+            </ModalFooter>
           </Form>
         </Modal>
       </div>

@@ -1,0 +1,30 @@
+.loading-shading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.loading-icon {
+  position: absolute;
+  font-size: 25px;
+  margin-top: 20%;
+  top: calc(45% - 10px);
+  left: calc(50% - 10px);
+  animation: spin 0.7s infinite linear;
+
+  border-top: 5px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+@keyframes spin {
+  from {
+      transform: scale(1) rotate(360deg);
+  }
+  to {
+      transform: scale(1) rotate(0deg);
+  }
+}

@@ -39,7 +39,7 @@ const MapComponent = compose(
         {props.data.map((marker, index) => (
           <Marker
             key={index}
-            position={marker.position}
+            position={{ lat: marker.lat, lng: marker.lng }}
             onClick={() => props.onMarkerClick(marker)}
           />
         ))}
@@ -58,12 +58,19 @@ class App2 extends React.PureComponent {
     onCenterChanged: {},
     center: { lat: 10.779739, lng: 106.678926 },
     markerClicked: null,
-    collapse: false
+    collapse: false,
+
+    user: null
   };
   toggle = () => {
     this.setState({ collapse: !this.state.collapse });
   };
   componentDidMount() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.setState({ user });
+      }
+    });
     db.ref('data').on('value', snapshot => {
       let new_data = [];
       snapshot.forEach(function(childSnapshot) {
@@ -108,8 +115,31 @@ class App2 extends React.PureComponent {
         });
       });
   };
+
+  logIn = () => {
+    firebase
+      .auth()
+      .signInWithPopup(new firebase.auth.GoogleAuthProvider())
+      .then(result => {
+        const user = result.user;
+        console.log(user);
+        this.setState({
+          user
+        });
+      });
+  };
+  logOut = () => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        this.setState({
+          user: null
+        });
+      });
+  };
   render() {
-    const { data } = this.state;
+    const { data, user } = this.state;
     const uLoaiTruong = [
       ...new Set(data.map(i => i.loaiTruong).filter(v => v !== 'undefined'))
     ];
@@ -127,7 +157,7 @@ class App2 extends React.PureComponent {
     ];
     return (
       <div>
-        <Header />
+        <Header user={user} logIn={this.logIn} logOut={this.logOut} />
 
         <Container fluid>
           <Row>
@@ -147,7 +177,10 @@ class App2 extends React.PureComponent {
                         if (selected.length !== 0) {
                           this.setState({
                             zoom: 16,
-                            center: selected[0].position
+                            center: {
+                              lat: selected[0].lat,
+                              lng: selected[0].lng
+                            }
                           });
                         }
                       }}
@@ -168,7 +201,10 @@ class App2 extends React.PureComponent {
                         if (selected.length !== 0) {
                           this.setState({
                             zoom: 20,
-                            center: selected[0].position
+                            center: {
+                              lat: selected[0].lat,
+                              lng: selected[0].lng
+                            }
                           });
                         }
                       }}
@@ -289,7 +325,9 @@ class App2 extends React.PureComponent {
                           selected={this.state.selected}
                         />
                       </FormGroup>
-                      <Button style={{marginBottom: 25}} color="primary">Tìm lại</Button>
+                      <Button style={{ marginBottom: 25 }} color="primary">
+                        Tìm lại
+                      </Button>
                     </Form>
                   </Collapse>
                 </div>

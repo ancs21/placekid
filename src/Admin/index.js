@@ -1,12 +1,14 @@
 import React from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
 
 import './index.css';
 import firebase from '../utils/firebase';
+import Loading from './loading';
 
 import {
   Navbar,
@@ -59,32 +61,46 @@ class AdminPage extends React.Component {
     const columns = [
       {
         dataField: 'soThuTu',
-        text: 'STT'
+        text: 'STT',
+        sort: true
       },
       {
         dataField: 'tenTruong',
-        text: 'Tên trường'
+        text: 'Tên trường',
+        sort: true,
+        filter: textFilter({
+          placeholder: 'tìm tên trường',
+          style: { fontSize: '13px' }
+        })
       },
       {
-        dataField: `position.lat`,
-        text: 'Latitude'
+        dataField: 'lat',
+        text: 'Latitude',
+        sort: true
       },
       {
-        dataField: `position.lng`,
-        text: 'Longtitude'
+        dataField: 'lng',
+        text: 'Longtitude',
+        sort: true
       },
       {
         dataField: 'diaChi',
-        text: 'Địa chỉ'
+        text: 'Địa chỉ',
+        sort: true,
+        filter: textFilter({
+          placeholder: 'tìm địa chỉ',
+          style: { fontSize: '13px' }
+        })
       },
       {
         dataField: 'phuong',
-        text: 'Phường'
+        text: 'Phường',
+        sort: true
       },
-
       {
         dataField: 'quan',
-        text: 'Quận'
+        text: 'Quận',
+        sort: true
       },
       {
         dataField: 'thanhPho',
@@ -96,11 +112,12 @@ class AdminPage extends React.Component {
       },
       {
         dataField: 'website',
-        text: 'Web Site'
+        text: 'WebSite'
       },
       {
         dataField: 'loaiTruong',
-        text: 'Loại trường'
+        text: 'Loại trường',
+        sort: true
       },
       {
         dataField: 'giayChungNhan',
@@ -120,11 +137,13 @@ class AdminPage extends React.Component {
       },
       {
         dataField: 'hocPhi',
-        text: 'Học phí'
+        text: 'Học phí',
+        sort: true
       },
       {
         dataField: 'doTuoiNhan',
-        text: 'Độ tuổi trẻ nhận giữ'
+        text: 'Độ tuổi trẻ nhận giữ',
+        sort: true
       },
       {
         dataField: 'thoiGianGiu',
@@ -137,7 +156,6 @@ class AdminPage extends React.Component {
     ];
     const rowEvents = {
       onClick: (e, row, rowIndex) => {
-        // console.log(row);
         this.toggle(row);
       }
     };
@@ -152,53 +170,27 @@ class AdminPage extends React.Component {
           light
           expand="md"
         >
-          <NavbarBrand href="/" style={{ color: '#fff' }}>
-            {/* <img src={logo} height="59" alt="" /> */}
+          <NavbarBrand href="#" style={{ color: '#fff' }}>
             Admin Page
           </NavbarBrand>
-          <Nav className="ml-auto" style={{ alignItems: 'center' }} navbar>
-            <NavItem>
-              <NavLink
-                href="#"
-                style={{
-                  color: '#ffffff'
-                }}
-              >
-                Quản lý vị trí
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="#" style={{ color: '#ffffff' }}>
-                Quản lý người dùng
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="#" style={{ color: '#ffffff' }}>
-                <Button
-                  style={{
-                    color: '#444',
-                    background: '#fff',
-                    boxShadow: ` 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)`
-                  }}
-                >
-                  <img src="#" height="22" alt="" />
-                  {'   '}Đăng nhập với Google
-                </Button>
-              </NavLink>
-            </NavItem>
-          </Nav>
+         
         </Navbar>
         <Container>
           <Row>
             <Col>
-              <BootstrapTable
-                classes="table-view"
-                keyField="soThuTu"
-                data={this.state.data}
-                columns={columns}
-                pagination={paginationFactory()}
-                rowEvents={rowEvents}
-              />
+              {this.state.data.length !== 0 ? (
+                <BootstrapTable
+                  classes="table-view"
+                  keyField="soThuTu"
+                  data={this.state.data}
+                  columns={columns}
+                  pagination={paginationFactory()}
+                  rowEvents={rowEvents}
+                  filter={filterFactory()}
+                />
+              ) : (
+                <Loading />
+              )}
             </Col>
           </Row>
         </Container>
