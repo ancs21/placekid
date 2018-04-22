@@ -13,10 +13,6 @@ import Loading from './loading';
 import {
   Navbar,
   NavbarBrand,
-  Nav,
-  NavItem,
-  NavLink,
-  Button,
   Container,
   Row,
   Col

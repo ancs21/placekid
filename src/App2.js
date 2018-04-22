@@ -1,7 +1,9 @@
 import React from 'react';
 import { compose, withProps } from 'recompose';
+// import SearchBox from './SearchBox';
+import StandaloneSearchBox from "react-google-maps/lib/components/places/StandaloneSearchBox";
+import Directions from './directions';
 import {
-  withScriptjs,
   withGoogleMap,
   GoogleMap,
   Marker
@@ -9,7 +11,7 @@ import {
 import { Container, Row, Col } from 'reactstrap';
 import { Button, FormGroup, Label } from 'reactstrap';
 import { Typeahead } from 'react-bootstrap-typeahead'; // ES2015
-import { Collapse, Form } from 'reactstrap';
+import { Collapse, Form, Input } from 'reactstrap';
 
 import ListDetail from './ListDetail';
 
@@ -19,13 +21,10 @@ const db = firebase.database();
 
 const MapComponent = compose(
   withProps({
-    googleMapURL:
-      'https://maps.googleapis.com/maps/api/js?key=AIzaSyCeNHOAwZYe401o8yWdDyK45FKwOjsS-w8&v=3.exp&libraries=geometry,drawing,places',
     loadingElement: <div style={{ height: `100vh` }} />,
     containerElement: <div style={{ height: `100vh` }} />,
     mapElement: <div style={{ height: `100vh` }} />
   }),
-  withScriptjs,
   withGoogleMap
 )(props => (
   <GoogleMap
@@ -49,19 +48,28 @@ const MapComponent = compose(
 ));
 
 class App2 extends React.PureComponent {
-  state = {
-    showDetail: false,
-    data: [],
-    isMarkerShown: true,
-    zoom: 12,
-    defaultCenter: { lat: 10.779739, lng: 106.678926 },
-    onCenterChanged: {},
-    center: { lat: 10.779739, lng: 106.678926 },
-    markerClicked: null,
-    collapse: false,
-
-    user: null
-  };
+  constructor() {
+    super();
+    this.state = {
+      showDetail: false,
+      data: [],
+      isMarkerShown: true,
+      zoom: 12,
+      onCenterChanged: {},
+      center: { lat: 10.779739, lng: 106.678926 },
+      markerClicked: null,
+      collapse: false,
+  
+      user: null,
+  
+      directionClick: null,
+      directions: null,
+      diaDiem: null,
+      placeSearch: null,
+    };
+    this.myRef = React.createRef();
+  }
+  
   toggle = () => {
     this.setState({ collapse: !this.state.collapse });
   };
@@ -100,7 +108,6 @@ class App2 extends React.PureComponent {
     this.refs.typeahead3.getInstance().clear();
     this.refs.typeahead4.getInstance().clear();
     this.refs.typeahead5.getInstance().clear();
-    const { searchAtr, data } = this.state;
     db
       .ref('data')
       .once('value')
@@ -138,6 +145,52 @@ class App2 extends React.PureComponent {
         });
       });
   };
+  handelDirection = id => {
+    this.setState({
+      directionClick: true,
+      diaDiem: {
+        noiden: { tenTruong: id.tenTruong, lat: id.lat, lng: id.lng }
+      }
+    });
+  };
+
+  handleChiDuong = () => {
+    const google = window.google;
+    const DirectionsService = new google.maps.DirectionsService();
+
+    DirectionsService.route(
+      {
+        origin: new google.maps.LatLng(this.state.placeSearch.lat, this.state.placeSearch.lng),
+        destination: new google.maps.LatLng(this.state.diaDiem.noiden.lat, this.state.diaDiem.noiden.lng),
+        travelMode: google.maps.TravelMode.DRIVING
+      },
+      (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+          this.setState({
+            directions: result
+          });
+        } else {
+          console.error(`error fetching directions ${result}`);
+        }
+      }
+    );
+  };
+
+
+  onPlacesChanged = () => {
+    // const refs = {}
+    // refs.searchBox = ref;
+    const places = this.myRef.current.getPlaces();
+    // console.log(places[0].geometry.location);
+    this.setState({
+      placeSearch: {
+        lat: places[0].geometry.location.lat(),
+        lng: places[0].geometry.location.lng(),
+      }
+    })
+
+  };
+
   render() {
     const { data, user } = this.state;
     const uLoaiTruong = [
@@ -155,6 +208,7 @@ class App2 extends React.PureComponent {
     const uthoiGianGiu = [
       ...new Set(data.map(i => i.thoiGianGiu).filter(v => v !== 'undefined'))
     ];
+
     return (
       <div>
         <Header user={user} logIn={this.logIn} logOut={this.logOut} />
@@ -163,7 +217,42 @@ class App2 extends React.PureComponent {
           <Row>
             <Col sm="4" className="sidebar">
               {this.state.showDetail ? (
-                <ListDetail marker={this.state.markerClicked} />
+                this.state.directionClick ? (
+                  <div>
+                    <div data-standalone-searchbox="">
+                      <StandaloneSearchBox
+                        onPlacesChanged={this.onPlacesChanged}
+                        ref={this.myRef}
+                      >
+                        <FormGroup>
+                          <Label for="noiDi">Nơi đi</Label>
+                          <Input
+                            type="text"
+                            name="noiDi"
+                            id="noiDi"
+                            placeholder="with a placeholder"
+                          />
+                        </FormGroup>
+                      </StandaloneSearchBox>
+                    </div>
+                    <FormGroup>
+                      <Label for="noiDen">Nơi đến</Label>
+                      <Input
+                        value={this.state.diaDiem.noiden.tenTruong}
+                        type="text"
+                        name="noiDen"
+                        id="noiDen"
+                        disabled
+                      />
+                    </FormGroup>
+                    <Button onClick={this.handleChiDuong}>Chỉ đường</Button>
+                  </div>
+                ) : (
+                  <ListDetail
+                    marker={this.state.markerClicked}
+                    direction={this.handelDirection}
+                  />
+                )
               ) : (
                 <div>
                   <FormGroup>
@@ -335,14 +424,18 @@ class App2 extends React.PureComponent {
             </Col>
 
             <Col sm="8" style={{ padding: 0 }}>
-              <MapComponent
-                zoom={this.state.zoom}
-                center={this.state.center}
-                data={this.state.data}
-                isMarkerShown={this.state.isMarkerShown}
-                onMarkerClick={this.handleMarkerClick}
-                onZoomChanged={this.onZoomChanged}
-              />
+              {this.state.directions ? (
+                <Directions directions={this.state.directions} />
+              ) : (
+                <MapComponent
+                  zoom={this.state.zoom}
+                  center={this.state.center}
+                  data={this.state.data}
+                  isMarkerShown={this.state.isMarkerShown}
+                  onMarkerClick={this.handleMarkerClick}
+                  onZoomChanged={this.onZoomChanged}
+                />
+              )}
             </Col>
           </Row>
         </Container>
