@@ -1,13 +1,9 @@
 import React from 'react';
 import { compose, withProps } from 'recompose';
 // import SearchBox from './SearchBox';
-import StandaloneSearchBox from "react-google-maps/lib/components/places/StandaloneSearchBox";
+import StandaloneSearchBox from 'react-google-maps/lib/components/places/StandaloneSearchBox';
 import Directions from './directions';
-import {
-  withGoogleMap,
-  GoogleMap,
-  Marker
-} from 'react-google-maps';
+import { withGoogleMap, GoogleMap, Marker } from 'react-google-maps';
 import { Container, Row, Col } from 'reactstrap';
 import { Button, FormGroup, Label } from 'reactstrap';
 import { Typeahead } from 'react-bootstrap-typeahead'; // ES2015
@@ -59,17 +55,16 @@ class App2 extends React.PureComponent {
       center: { lat: 10.779739, lng: 106.678926 },
       markerClicked: null,
       collapse: false,
-  
+
       user: null,
-  
       directionClick: null,
       directions: null,
       diaDiem: null,
-      placeSearch: null,
+      placeSearch: null
     };
     this.myRef = React.createRef();
   }
-  
+
   toggle = () => {
     this.setState({ collapse: !this.state.collapse });
   };
@@ -160,8 +155,14 @@ class App2 extends React.PureComponent {
 
     DirectionsService.route(
       {
-        origin: new google.maps.LatLng(this.state.placeSearch.lat, this.state.placeSearch.lng),
-        destination: new google.maps.LatLng(this.state.diaDiem.noiden.lat, this.state.diaDiem.noiden.lng),
+        origin: new google.maps.LatLng(
+          this.state.placeSearch.lat,
+          this.state.placeSearch.lng
+        ),
+        destination: new google.maps.LatLng(
+          this.state.diaDiem.noiden.lat,
+          this.state.diaDiem.noiden.lng
+        ),
         travelMode: google.maps.TravelMode.DRIVING
       },
       (result, status) => {
@@ -176,19 +177,17 @@ class App2 extends React.PureComponent {
     );
   };
 
-
   onPlacesChanged = () => {
-    // const refs = {}
-    // refs.searchBox = ref;
     const places = this.myRef.current.getPlaces();
-    // console.log(places[0].geometry.location);
-    this.setState({
-      placeSearch: {
-        lat: places[0].geometry.location.lat(),
-        lng: places[0].geometry.location.lng(),
-      }
-    })
-
+    this.setState(
+      {
+        placeSearch: {
+          lat: places[0].geometry.location.lat(),
+          lng: places[0].geometry.location.lng()
+        }
+      },
+      () => this.handleChiDuong()
+    );
   };
 
   render() {
@@ -230,7 +229,7 @@ class App2 extends React.PureComponent {
                             type="text"
                             name="noiDi"
                             id="noiDi"
-                            placeholder="with a placeholder"
+                            placeholder="Nhập nơi đi"
                           />
                         </FormGroup>
                       </StandaloneSearchBox>
@@ -245,7 +244,7 @@ class App2 extends React.PureComponent {
                         disabled
                       />
                     </FormGroup>
-                    <Button onClick={this.handleChiDuong}>Chỉ đường</Button>
+                    {/* <Button onClick={this.handleChiDuong}>Chỉ đường</Button> */}
                   </div>
                 ) : (
                   <ListDetail

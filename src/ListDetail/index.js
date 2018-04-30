@@ -99,18 +99,18 @@ export default class ListDetail extends React.Component {
           {datamarker.loaiTruong !== "undefined" ? (
             datamarker.loaiTruong === "Dân Lập" ? (
               <Button style={{ marginBottom: 30 }} outline color="info">
-                Nhận tuyển sinh theo nhu cầu
+                Nhận tuyển sinh trẻ theo nhu cầu
               </Button>
             ) : (
               <Button style={{ marginBottom: 30 }} outline color="info">
-                Nhận tuyển sinh{" "}
+                Nhận tuyển sinh trẻ tại{" "}
                 {datamarker.phuong !== "undefined" ? datamarker.phuong : null}{" "}
                 và các phường lân cận
               </Button>
             )
           ) : (
             <Button style={{ marginBottom: 30 }} outline color="info">
-              Nhận tuyển sinh{" "}
+              Nhận tuyển sinh trẻ tại{" "}
               {datamarker.phuong !== "undefined" ? datamarker.phuong : null} và
               các phường lân cận
             </Button>
