@@ -10,8 +10,9 @@ import { Collapse, Form, Input } from 'reactstrap';
 import { ListGroup, ListGroupItem } from 'reactstrap';
 
 // icons
-import iconMarker24 from './icons/icon_marker24.png'
-import iconMarker48 from './icons/icon_marker48.png'
+import iconMarker16 from './icons/icon_marker16.png';
+import iconMarker24 from './icons/icon_marker24.png';
+import iconMarker48 from './icons/icon_marker48.png';
 import ListDetail from './ListDetail';
 import Header from './Header';
 
@@ -27,7 +28,7 @@ const MapComponent = compose(
   withGoogleMap
 )(props => (
   <GoogleMap
-    ref={props.onMapMounted}
+    ref={props.zoomRef}
     center={props.center}
     zoom={props.zoom}
     onZoomChanged={props.onZoomChanged}
@@ -70,6 +71,7 @@ class App2 extends React.PureComponent {
       }
     };
     this.myRef = React.createRef();
+    this.zoomRef = React.createRef();
   }
 
   toggle = () => {
@@ -97,11 +99,25 @@ class App2 extends React.PureComponent {
   };
 
   onZoomChanged = () => {
-    this.setState({
-      zoom: 17,
-      center: { lat: 10.7882937, lng: 106.6946765 },
-      icon: iconMarker24
-    });
+    const zoomNum = this.zoomRef.current.getZoom();
+    console.log(zoomNum);
+    if (zoomNum < 13 && zoomNum >=11) {
+      this.setState({
+        icon: iconMarker16,
+        isMarkerShown: true
+      });
+    } else if (zoomNum < 11) {
+      this.setState({
+        isMarkerShown: false
+      });
+    } else {
+      this.setState({
+        zoom: 17,
+        center: { lat: 10.7882937, lng: 106.6946765 },
+        icon: iconMarker24,
+        isMarkerShown: true
+      });
+    }
   };
 
   handleSubmit = e => {
@@ -171,7 +187,8 @@ class App2 extends React.PureComponent {
           this.state.diaDiem.noiden.lat,
           this.state.diaDiem.noiden.lng
         ),
-        travelMode: google.maps.TravelMode.DRIVING
+        travelMode: google.maps.TravelMode.DRIVING,
+        language: 'vi'
       },
       (result, status) => {
         if (status === google.maps.DirectionsStatus.OK) {
@@ -468,6 +485,7 @@ class App2 extends React.PureComponent {
                 <Directions directions={this.state.directions} />
               ) : (
                 <MapComponent
+                  zoomRef={this.zoomRef}
                   zoom={this.state.zoom}
                   center={this.state.center}
                   data={this.state.data}
