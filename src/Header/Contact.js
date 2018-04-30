@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Form, Input, Col, FormGroup, Label } from 'reactstrap';
 
-import firebase from './utils/firebase';
+import firebase from '../utils/firebase';
 const db = firebase.database();
 
 class Contact extends React.Component {

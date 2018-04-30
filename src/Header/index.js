@@ -1,12 +1,12 @@
 import React from 'react';
 import { Navbar, NavbarBrand, Nav, NavItem, NavLink } from 'reactstrap';
-import GGIcon from '../ggicon.svg';
 
-import Contact from '../Contact';
-
+import Contact from './Contact';
+import HuongDan from './HuongDan';
 class Header extends React.Component {
   state = {
-    modal: false
+    modal: false,
+    modalHD: false
   };
 
   showContact = () => {
@@ -14,13 +14,24 @@ class Header extends React.Component {
       modal: !this.state.modal
     });
   };
+
   toggle = () => {
     this.setState({
       modal: !this.state.modal
     });
   };
+  showHD = () => {
+    this.setState({
+      modalHD: !this.state.modalHD
+    });
+  };
+  toggleHD = () => {
+    this.setState({
+      modalHD: !this.state.modalHD
+    });
+  };
+
   render() {
-    const { user, logIn, logOut } = this.props;
     return (
       <Navbar
         fixed="top"
@@ -39,7 +50,7 @@ class Header extends React.Component {
         <Nav className="ml-auto" style={{ alignItems: 'center' }} navbar>
           <NavItem>
             <NavLink
-              href="#"
+              href="/"
               style={{
                 color: '#ffffff'
               }}
@@ -48,9 +59,14 @@ class Header extends React.Component {
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="#" style={{ color: '#ffffff' }}>
+            <NavLink
+              href="#"
+              onClick={this.showHD}
+              style={{ color: '#ffffff' }}
+            >
               Hướng dẫn
             </NavLink>
+            <HuongDan modalHD={this.state.modalHD} toggleHD={this.toggleHD} />
           </NavItem>
           <NavItem>
             <NavLink
@@ -62,28 +78,6 @@ class Header extends React.Component {
             </NavLink>
             <Contact modal={this.state.modal} toggle={this.toggle} />
           </NavItem>
-          {/* <NavItem>
-        <NavLink href="#" style={{ color: '#ffffff' }}>
-          {user ? (
-            <div>
-              <img src={user.photoURL} height="35" alt="" />
-              <Button onClick={logOut}>Đăng xuất</Button>
-            </div>
-          ) : (
-            <Button
-              onClick={logIn}
-              style={{
-                color: '#444',
-                background: '#fff',
-                boxShadow: ` 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)`
-              }}
-            >
-              <img src={GGIcon} height="22" alt="" />
-              {'   '}Đăng nhập với Google
-            </Button>
-          )}
-        </NavLink>
-      </NavItem> */}
         </Nav>
       </Navbar>
     );
