@@ -48,7 +48,7 @@ const MapComponent = compose(
   </GoogleMap>
 ));
 
-class App2 extends React.PureComponent {
+class App extends React.PureComponent {
   constructor() {
     super();
     this.state = {
@@ -68,7 +68,9 @@ class App2 extends React.PureComponent {
       placeSearch: null,
       icon: {
         url: iconMarker24
-      }
+      },
+
+      quanSelect: ''
     };
     this.myRef = React.createRef();
     this.zoomRef = React.createRef();
@@ -101,7 +103,7 @@ class App2 extends React.PureComponent {
   onZoomChanged = () => {
     const zoomNum = this.zoomRef.current.getZoom();
     console.log(zoomNum);
-    if (zoomNum < 13 && zoomNum >=11) {
+    if (zoomNum < 13 && zoomNum >= 11) {
       this.setState({
         icon: iconMarker16,
         isMarkerShown: true
@@ -236,6 +238,21 @@ class App2 extends React.PureComponent {
       ...new Set(data.map(i => i.thoiGianGiu).filter(v => v !== 'undefined'))
     ];
 
+    // quan
+    const uQuan = [...new Set(data.map(i => i.quan))];
+    console.log(uQuan);
+
+    const dataQuanSelect = data.filter((v, i) => v.quan === this.state.quanSelect)
+    console.log(dataQuanSelect);
+    	
+
+    function unique(array, propertyName) {
+      return array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i);
+    }
+    const uniqueQuan = unique(data, 'quan')
+    // console.log(uniqueQuan)
+    // phuong theo quan
+
     return (
       <div>
         <Header user={user} logIn={this.logIn} logOut={this.logOut} />
@@ -310,16 +327,47 @@ class App2 extends React.PureComponent {
               ) : (
                 <div>
                   <FormGroup>
-                    <Label for="phuong">Tìm theo phường</Label>
+                    <Label for="phuong">Tìm theo Quận</Label>
                     <Typeahead
-                      labelKey="diaChiKhuVuc"
+                      labelKey="quan"
+                      placeholder="Nhập địa chỉ quận"
+                      paginationText="Xem thêm"
+                      emptyLabel="Không có dữ liệu"
+                      onChange={selected => {
+                        this.setState({
+                          quanSelect: ''
+                        })
+                        if (selected.length !== 0) {
+                          this.setState({
+                            zoom: 15,
+                            center: {
+                              lat: selected[0].lat,
+                              lng: selected[0].lng
+                            },
+                            quanSelect: selected[0].quan
+                          });
+                        } else {
+                          this.setState({
+                            quanSelect: ''
+                          })
+                        }
+                      }}
+                      options={uniqueQuan}
+                      selected={this.state.selected}
+                    />
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label for="phuong">Tìm theo Phường</Label>
+                    <Typeahead
+                      labelKey="phuong"
                       placeholder="Nhập địa chỉ phường"
                       paginationText="Xem thêm"
                       emptyLabel="Không có dữ liệu"
                       onChange={selected => {
                         if (selected.length !== 0) {
                           this.setState({
-                            zoom: 16,
+                            zoom: 17,
                             center: {
                               lat: selected[0].lat,
                               lng: selected[0].lng
@@ -327,7 +375,7 @@ class App2 extends React.PureComponent {
                           });
                         }
                       }}
-                      options={this.state.data}
+                      options={unique(dataQuanSelect, 'phuong')}
                       selected={this.state.selected}
                     />
                   </FormGroup>
@@ -502,4 +550,4 @@ class App2 extends React.PureComponent {
     );
   }
 }
-export default App2;
+export default App;
