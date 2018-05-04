@@ -13,6 +13,7 @@ import { ListGroup, ListGroupItem } from 'reactstrap';
 import iconMarker16 from './icons/icon_marker16.png';
 import iconMarker24 from './icons/icon_marker24.png';
 import iconMarker48 from './icons/icon_marker48.png';
+import Gps from './icons/gps.svg';
 import ListDetail from './ListDetail';
 import Header from './Header';
 
@@ -197,7 +198,7 @@ class App extends React.PureComponent {
           this.setState({
             directions: result
           });
-          console.log(this.state.directions.routes[0].legs[0]);
+          // console.log(this.state.directions.routes[0].legs[0]);
         } else {
           console.error(`error fetching directions ${result}`);
         }
@@ -218,6 +219,47 @@ class App extends React.PureComponent {
     );
   };
 
+  handleGps = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          const geocoder = new window.google.maps.Geocoder();
+          geocoder.geocode({ location: pos }, (results, status) => {
+            if (status === 'OK') {
+              if (results[0]) {
+                document.getElementById('noiDi').value = results[0].formatted_address;
+                // console.log(results[0].formatted_address);
+              } else {
+                console.log('No results found');
+              }
+            } else {
+              console.log('Geocoder failed due to: ' + status);
+            }
+          });
+          this.setState(
+            {
+              placeSearch: {
+                lat: pos.lat,
+                lng: pos.lng
+              }
+            },
+            () => {
+              this.handleChiDuong();
+            }
+          );
+        },
+        () => {
+          console.log('err gps location');
+        }
+      );
+    } else {
+      console.log("Browser doesn't support Geolocation");
+    }
+  };
   render() {
     const { data, user } = this.state;
     // const route = this.state.directions.routes[0].legs[0];
@@ -239,19 +281,17 @@ class App extends React.PureComponent {
     ];
 
     // quan
-    const uQuan = [...new Set(data.map(i => i.quan))];
-    console.log(uQuan);
-
-    const dataQuanSelect = data.filter((v, i) => v.quan === this.state.quanSelect)
-    console.log(dataQuanSelect);
-    	
-
+    // const uQuan = [...new Set(data.map(i => i.quan))];
+    const dataQuanSelect = data.filter(
+      (v, i) => v.quan === this.state.quanSelect
+    );
     function unique(array, propertyName) {
-      return array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i);
+      return array.filter(
+        (e, i) =>
+          array.findIndex(a => a[propertyName] === e[propertyName]) === i
+      );
     }
-    const uniqueQuan = unique(data, 'quan')
-    // console.log(uniqueQuan)
-    // phuong theo quan
+    const uniqueQuan = unique(data, 'quan');
 
     return (
       <div>
@@ -263,19 +303,34 @@ class App extends React.PureComponent {
               {this.state.showDetail ? (
                 this.state.directionClick ? (
                   <div>
-                    <div data-standalone-searchbox="">
+                    <div data-standalone-searchbox="hello">
                       <StandaloneSearchBox
                         onPlacesChanged={this.onPlacesChanged}
                         ref={this.myRef}
                       >
                         <FormGroup>
                           <Label for="noiDi">Nơi đi</Label>
-                          <Input
-                            type="text"
-                            name="noiDi"
-                            id="noiDi"
-                            placeholder="Nhập nơi đi"
-                          />
+                          <div style={{ position: 'relative' }}>
+                            <Input
+                              type="text"
+                              name="noiDi"
+                              id="noiDi"
+                              placeholder="Nhập nơi đi"
+                            />
+                            <img
+                              onClick={this.handleGps}
+                              style={{
+                                width: 24,
+                                height: 24,
+                                position: 'absolute',
+                                top: '15%',
+                                right: '10px',
+                                cursor: 'pointer'
+                              }}
+                              src={Gps}
+                              alt=""
+                            />
+                          </div>
                         </FormGroup>
                       </StandaloneSearchBox>
                     </div>
@@ -330,13 +385,13 @@ class App extends React.PureComponent {
                     <Label for="phuong">Tìm theo Quận</Label>
                     <Typeahead
                       labelKey="quan"
-                      placeholder="Nhập địa chỉ quận"
+                      placeholder="Nhập quận"
                       paginationText="Xem thêm"
                       emptyLabel="Không có dữ liệu"
                       onChange={selected => {
                         this.setState({
                           quanSelect: ''
-                        })
+                        });
                         if (selected.length !== 0) {
                           this.setState({
                             zoom: 15,
@@ -349,7 +404,7 @@ class App extends React.PureComponent {
                         } else {
                           this.setState({
                             quanSelect: ''
-                          })
+                          });
                         }
                       }}
                       options={uniqueQuan}
@@ -361,7 +416,7 @@ class App extends React.PureComponent {
                     <Label for="phuong">Tìm theo Phường</Label>
                     <Typeahead
                       labelKey="phuong"
-                      placeholder="Nhập địa chỉ phường"
+                      placeholder="Nhập phường"
                       paginationText="Xem thêm"
                       emptyLabel="Không có dữ liệu"
                       onChange={selected => {

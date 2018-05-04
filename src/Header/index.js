@@ -36,9 +36,9 @@ class Header extends React.Component {
       <Navbar
         fixed="top"
         style={{
-          background: '#3F3E3A',
+          background: '#2506A0',
           height: 64,
-          boxShadow: `0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)`
+          boxShadow: 'rgba(0, 0, 0, 0.16) 0px 2px 5px, rgba(0, 0, 0, 0.2) 0px 1px 2px'
         }}
         light
         expand="md"
