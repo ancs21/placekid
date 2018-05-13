@@ -15,6 +15,8 @@ import { Navbar, NavbarBrand, Nav, NavItem, NavLink } from 'reactstrap';
 import { Container, Row, Col, Button } from 'reactstrap';
 
 import ModalForm from './ModalForm';
+import AddLocation from './AddLocation';
+
 import GGIcon from '../ggicon.svg';
 
 import LienHe from './LienHe';
@@ -25,7 +27,8 @@ class AdminPage extends React.Component {
     data: [],
     modal: false,
     clickValue: {},
-    lienhe: false
+    lienhe: false,
+    modalAdd: false
   };
   componentWillMount() {
     firebase.auth().onAuthStateChanged(user => {
@@ -68,6 +71,12 @@ class AdminPage extends React.Component {
     });
   };
 
+  toggleAdd = () => {
+    // console.log();
+    this.setState({
+      modalAdd: !this.state.modalAdd
+    });
+  };
   logIn = () => {
     firebase
       .auth()
@@ -90,6 +99,7 @@ class AdminPage extends React.Component {
         });
       });
   };
+
   render() {
     const columns = [
       {
@@ -243,22 +253,46 @@ class AdminPage extends React.Component {
           </Nav>
         </Navbar>
         {this.state.lienhe ? (
-          <LienHe />
+          admin ? (
+            <LienHe />
+          ) : (
+            <div style={{ textAlign: 'center', marginTop: '100px' }}>
+              <Button
+                onClick={this.logIn}
+                style={{
+                  color: '#444',
+                  background: '#fff',
+                  boxShadow: ` 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)`
+                }}
+              >
+                <img src={GGIcon} height="22" alt="" />
+                {'   '}Đăng nhập với Google
+              </Button>
+            </div>
+          )
         ) : admin ? (
           <div>
             <Container>
               <Row>
                 <Col>
                   {this.state.data.length !== 0 ? (
-                    <BootstrapTable
-                      classes="table-view"
-                      keyField="soThuTu"
-                      data={this.state.data}
-                      columns={columns}
-                      pagination={paginationFactory()}
-                      rowEvents={rowEvents}
-                      filter={filterFactory()}
-                    />
+                    <div>
+                      <Button
+                        style={{ marginTop: 20 }}
+                        onClick={this.toggleAdd}
+                      >
+                        Thêm trường
+                      </Button>
+                      <BootstrapTable
+                        classes="table-view"
+                        keyField="soThuTu"
+                        data={this.state.data}
+                        columns={columns}
+                        pagination={paginationFactory()}
+                        rowEvents={rowEvents}
+                        filter={filterFactory()}
+                      />
+                    </div>
                   ) : (
                     <Loading />
                   )}
@@ -271,6 +305,7 @@ class AdminPage extends React.Component {
               toggle={this.toggle}
               value={this.state.clickValue}
             />
+            <AddLocation modal={this.state.modalAdd} toggle={this.toggleAdd} />
           </div>
         ) : (
           <div style={{ textAlign: 'center', marginTop: '100px' }}>

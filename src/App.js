@@ -74,6 +74,7 @@ class App extends React.PureComponent {
       quanSelect: ''
     };
     this.myRef = React.createRef();
+    this.myRef2 = React.createRef();
     this.zoomRef = React.createRef();
   }
 
@@ -219,6 +220,71 @@ class App extends React.PureComponent {
     );
   };
 
+  onPlacesChanged2 = () => {
+    const places = this.myRef2.current.getPlaces();
+    this.setState(
+      {
+        placeSearch: {
+          lat: places[0].geometry.location.lat(),
+          lng: places[0].geometry.location.lng()
+        }
+      },
+      () => {
+        this.setState({
+          zoom: 15,
+          center: {
+            lat: this.state.placeSearch.lat,
+            lng: this.state.placeSearch.lng
+          }
+        });
+      }
+    );
+  };
+
+  handleGps2 = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        const pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ location: pos }, (results, status) => {
+          if (status === 'OK') {
+            if (results[0]) {
+              document.getElementById('vitri').value =
+                results[0].formatted_address;
+              // console.log(results[0].formatted_address);
+            } else {
+              console.log('No results found');
+            }
+          } else {
+            console.log('Geocoder failed due to: ' + status);
+          }
+        });
+        this.setState(
+          {
+            placeSearch: {
+              lat: pos.lat,
+              lng: pos.lng
+            }
+          },
+          () => {
+            this.setState({
+              zoom: 15,
+              center: {
+                lat: this.state.placeSearch.lat,
+                lng: this.state.placeSearch.lng
+              }
+            });
+          }
+        );
+      });
+    } else {
+      console.log("Browser doesn't support Geolocation");
+    }
+  };
+
   handleGps = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -231,7 +297,8 @@ class App extends React.PureComponent {
           geocoder.geocode({ location: pos }, (results, status) => {
             if (status === 'OK') {
               if (results[0]) {
-                document.getElementById('noiDi').value = results[0].formatted_address;
+                document.getElementById('noiDi').value =
+                  results[0].formatted_address;
                 // console.log(results[0].formatted_address);
               } else {
                 console.log('No results found');
@@ -381,6 +448,38 @@ class App extends React.PureComponent {
                 )
               ) : (
                 <div>
+                  <div data-standalone-searchbox="hola">
+                    <StandaloneSearchBox
+                      onPlacesChanged={this.onPlacesChanged2}
+                      ref={this.myRef2}
+                    >
+                      <FormGroup>
+                        <Label for="vitri">Tìm theo vị trí</Label>
+                        <div style={{ position: 'relative' }}>
+                          <Input
+                            type="text"
+                            name="vitri"
+                            id="vitri"
+                            placeholder="Nhập vị trí"
+                          />
+                          <img
+                            onClick={this.handleGps2}
+                            style={{
+                              width: 24,
+                              height: 24,
+                              position: 'absolute',
+                              top: '15%',
+                              right: '10px',
+                              cursor: 'pointer'
+                            }}
+                            src={Gps}
+                            alt=""
+                          />
+                        </div>
+                      </FormGroup>
+                    </StandaloneSearchBox>
+                  </div>
+
                   <FormGroup>
                     <Label for="phuong">Tìm theo Quận</Label>
                     <Typeahead
