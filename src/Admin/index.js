@@ -37,20 +37,32 @@ class AdminPage extends React.Component {
       }
     });
     const db = firebase.database();
-    db
-      .ref('data')
-      .once('value')
-      .then(snapshot => {
-        let new_data = [];
-        snapshot.forEach(childSnapshot => {
-          const childData = childSnapshot.val();
-          childData['key'] = childSnapshot.key;
-          new_data.push(childData);
-        });
-        this.setState({
-          data: new_data
-        });
+    // db
+    //   .ref('data')
+    //   .once('value')
+    //   .then(snapshot => {
+    //     let new_data = [];
+    //     snapshot.forEach(childSnapshot => {
+    //       const childData = childSnapshot.val();
+    //       childData['key'] = childSnapshot.key;
+    //       new_data.push(childData);
+    //     });
+    //     this.setState({
+    //       data: new_data
+    //     });
+    //   });
+
+    db.ref('data').on('value', snapshot => {
+      let new_data = [];
+      snapshot.forEach(childSnapshot => {
+        const childData = childSnapshot.val();
+        childData['key'] = childSnapshot.key;
+        new_data.push(childData);
       });
+      this.setState({
+        data: new_data
+      });
+    });
   }
   handleLH = () => {
     this.setState({

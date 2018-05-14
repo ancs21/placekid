@@ -33,6 +33,20 @@ const MapComponent = compose(
     center={props.center}
     zoom={props.zoom}
     onZoomChanged={props.onZoomChanged}
+    options={{
+      styles: [
+        {
+          featureType: 'poi',
+          elementType: 'labels',
+          stylers: [{ visibility: 'off' }]
+        },
+        {
+          featureType: 'transit',
+          elementType: 'labels.icon',
+          stylers: [{ visibility: 'off' }]
+        }
+      ]
+    }}
   >
     {props.isMarkerShown && (
       <div>
@@ -330,7 +344,6 @@ class App extends React.PureComponent {
   render() {
     const { data, user } = this.state;
     // const route = this.state.directions.routes[0].legs[0];
-
     const uLoaiTruong = [
       ...new Set(data.map(i => i.loaiTruong).filter(v => v !== 'undefined'))
     ];

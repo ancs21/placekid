@@ -33,7 +33,6 @@ class AddLocation extends React.Component {
 
   render() {
     const { modal, toggle, className } = this.props;
-    const { v } = this.state;
     return (
       <div>
         <Modal size="lg" isOpen={modal} toggle={toggle} className={className}>
