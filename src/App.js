@@ -8,7 +8,7 @@ import { Button, FormGroup, Label } from 'reactstrap';
 import { Typeahead } from 'react-bootstrap-typeahead'; // ES2015
 import { Collapse, Form, Input } from 'reactstrap';
 import { ListGroup, ListGroupItem } from 'reactstrap';
-
+import { Circle } from 'react-google-maps';
 // icons
 import iconMarker16 from './icons/icon_marker16.png';
 import iconMarker24 from './icons/icon_marker24.png';
@@ -58,6 +58,19 @@ const MapComponent = compose(
             icon={props.icon}
           />
         ))}
+        {props.changeCircle && (
+          <Circle
+            center={props.center}
+            radius={3000}
+            options={{
+              strokeColor: 'rgb(37, 6, 160)',
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: 'rgb(37, 6, 160)',
+              fillOpacity: 0.35
+            }}
+          />
+        )}
       </div>
     )}
   </GoogleMap>
@@ -75,7 +88,7 @@ class App extends React.PureComponent {
       center: { lat: 10.779739, lng: 106.678926 },
       markerClicked: null,
       collapse: false,
-
+      changeCircle: false,
       user: null,
       directionClick: null,
       directions: null,
@@ -118,7 +131,6 @@ class App extends React.PureComponent {
 
   onZoomChanged = () => {
     const zoomNum = this.zoomRef.current.getZoom();
-    console.log(zoomNum);
     if (zoomNum < 13 && zoomNum >= 11) {
       this.setState({
         icon: iconMarker16,
@@ -131,7 +143,6 @@ class App extends React.PureComponent {
     } else {
       this.setState({
         zoom: 17,
-        center: { lat: 10.7882937, lng: 106.6946765 },
         icon: iconMarker24,
         isMarkerShown: true
       });
@@ -166,7 +177,6 @@ class App extends React.PureComponent {
       .signInWithPopup(new firebase.auth.GoogleAuthProvider())
       .then(result => {
         const user = result.user;
-        console.log(user);
         this.setState({
           user
         });
@@ -213,7 +223,6 @@ class App extends React.PureComponent {
           this.setState({
             directions: result
           });
-          // console.log(this.state.directions.routes[0].legs[0]);
         } else {
           console.error(`error fetching directions ${result}`);
         }
@@ -268,7 +277,6 @@ class App extends React.PureComponent {
             if (results[0]) {
               document.getElementById('vitri').value =
                 results[0].formatted_address;
-              // console.log(results[0].formatted_address);
             } else {
               console.log('No results found');
             }
@@ -547,7 +555,7 @@ class App extends React.PureComponent {
                     />
                   </FormGroup>
                   <FormGroup>
-                    <Label for="phuong">Tìm theo trường</Label>
+                    <Label for="tenTruong">Tìm theo trường</Label>
                     <Typeahead
                       labelKey="tenTruong"
                       placeholder="Chọn tên trường"
@@ -565,7 +573,8 @@ class App extends React.PureComponent {
                             },
                             icon: {
                               url: iconMarker48
-                            }
+                            },
+                            changeCircle: true
                           });
                         }
                       }}
@@ -708,6 +717,7 @@ class App extends React.PureComponent {
                   onMarkerClick={this.handleMarkerClick}
                   onZoomChanged={this.onZoomChanged}
                   icon={this.state.icon}
+                  changeCircle={this.state.changeCircle}
                 />
               )}
             </Col>

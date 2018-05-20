@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Container, Row, Col } from 'reactstrap';
+import { Table, Container, Row, Col, Button } from 'reactstrap';
 import './index.css';
 import Loading from './loading';
 import firebase from '../utils/firebase';
@@ -14,6 +14,7 @@ class LienHe extends Component {
       let new_data = [];
       snapshot.forEach(childSnapshot => {
         const childData = childSnapshot.val();
+        childData['key'] = childSnapshot.key;
         new_data.push(childData);
       });
       this.setState({
@@ -21,6 +22,9 @@ class LienHe extends Component {
       });
     });
   }
+  delete = key => {
+    db.ref(`contact/${key}`).remove();
+  };
   render() {
     return (
       <div>
@@ -28,7 +32,11 @@ class LienHe extends Component {
           <Row>
             <Col>
               {this.state.data.length !== 0 ? (
-                <Table striped className="table-view" style={{display: 'table'}}>
+                <Table
+                  striped
+                  className="table-view"
+                  style={{ display: 'table' }}
+                >
                   <thead>
                     <tr>
                       <th>#</th>
@@ -43,7 +51,16 @@ class LienHe extends Component {
                         <th scope="row">{i}</th>
                         <td>{v.email}</td>
                         <td>{v.tieude}</td>
-                        <td>{v.noidung}</td>
+                        <td className="tdlh">{v.noidung}</td>
+                        <td>
+                          <Button
+                            color="danger"
+                            onClick={() => this.delete(v.key)}
+                            size="sm"
+                          >
+                            Xóa
+                          </Button>{' '}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
