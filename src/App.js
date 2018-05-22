@@ -9,6 +9,8 @@ import { Typeahead } from 'react-bootstrap-typeahead'; // ES2015
 import { Collapse, Form, Input } from 'reactstrap';
 import { ListGroup, ListGroupItem, Tooltip } from 'reactstrap';
 import { Circle } from 'react-google-maps';
+
+import AddSchoolAnonymous from './AddSchoolAnonymous';
 // icons
 import iconMarker16 from './icons/icon_marker16.png';
 import iconMarker24 from './icons/icon_marker24.png';
@@ -101,29 +103,38 @@ class App extends React.PureComponent {
       quanSelect: '',
 
       tooltipOpen: false,
-      textGPS: 'Không có địa chỉ'
+      textGPS: 'Không có địa chỉ',
+      modalAdd: false
     };
     this.myRef = React.createRef();
     this.myRef2 = React.createRef();
     this.zoomRef = React.createRef();
   }
-  handleTooltipOpen = () => {
+  toggleAdd = () => {
     this.setState({
-      tooltipOpen: !this.state.tooltipOpen
+      modalAdd: !this.state.modalAdd
     });
-  }
-  toggle = () => {
-    this.setState({ collapse: !this.state.collapse });
   };
+
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.setState({ user });
       }
     });
-    db.ref('data').on('value', snapshot => {
+    // db.ref('data').on('value', snapshot => {
+    //   let new_data = [];
+    //   snapshot.forEach(childSnapshot => {
+    //     const childData = childSnapshot.val();
+    //     new_data.push(childData);
+    //   });
+    //   this.setState({
+    //     data: new_data
+    //   });
+    // });
+    db.ref('data').once('value').then(snapshot => {
       let new_data = [];
-      snapshot.forEach(function (childSnapshot) {
+      snapshot.forEach(childSnapshot => {
         const childData = childSnapshot.val();
         new_data.push(childData);
       });
@@ -131,7 +142,16 @@ class App extends React.PureComponent {
         data: new_data
       });
     });
+
   }
+  handleTooltipOpen = () => {
+    this.setState({
+      tooltipOpen: !this.state.tooltipOpen
+    });
+  };
+  toggle = () => {
+    this.setState({ collapse: !this.state.collapse });
+  };
   handleMarkerClick = marker => {
     this.setState({ showDetail: true, markerClicked: marker });
   };
@@ -286,11 +306,14 @@ class App extends React.PureComponent {
               //   results[0].formatted_address;
               // remove frist and last text
               let rlt = results[0].formatted_address;
-              rlt = rlt.split(',').slice(1, -1).join()
-              console.log(rlt)
+              rlt = rlt
+                .split(',')
+                .slice(1, -1)
+                .join();
+              console.log(rlt);
               this.setState({
                 textGPS: rlt
-              })
+              });
             } else {
               console.log('No results found');
             }
@@ -477,252 +500,277 @@ class App extends React.PureComponent {
                     )}
                   </div>
                 ) : (
-                    <ListDetail
-                      marker={this.state.markerClicked}
-                      direction={this.handelDirection}
-                    />
-                  )
+                  <ListDetail
+                    marker={this.state.markerClicked}
+                    direction={this.handelDirection}
+                  />
+                )
               ) : (
-                  <div>
-                    <div style={{
+                <div>
+                  <div
+                    style={{
                       display: 'flex',
-                      justifyContent: 'flex-end'
-                    }} >
-                      <Button onClick={this.handleGps2} style={{ marginBottom: '20px' }} id={'Tooltip-1'} color="info">Định vị
-                    <img
-                          style={{
-                            width: 24,
-                            height: 24,
-                            color: '#fff',
-                            marginLeft: 10
-                          }}
-                          src={Gps}
-                          alt=""
-                        /></Button>
-                    </div>
-                    <Tooltip id="tooltipA" placement={'left'} isOpen={this.state.tooltipOpen} target={'Tooltip-1'} toggle={this.handleTooltipOpen}>
-                      {this.state.textGPS}
-                    </Tooltip>
-                    <FormGroup>
-                      <Label for="phuong">Tìm theo Quận</Label>
-                      <Typeahead
-                        labelKey="quan"
-                        placeholder="Nhập quận"
-                        paginationText="Xem thêm"
-                        emptyLabel="Không có dữ liệu"
-                        onChange={selected => {
+                      justifyContent: 'space-between'
+                    }}
+                  >
+                    <Button
+                      color="success"
+                      style={{ marginBottom: '20px' }}
+                      onClick={this.toggleAdd}
+                    >
+                      Thêm trường mới
+                    </Button>
+
+                    <AddSchoolAnonymous
+                      modal={this.state.modalAdd}
+                      toggle={this.toggleAdd}
+                    />
+                    <Button
+                      onClick={this.handleGps2}
+                      style={{ marginBottom: '20px' }}
+                      id={'Tooltip-1'}
+                      color="info"
+                    >
+                      Định vị
+                      <img
+                        style={{
+                          width: 24,
+                          height: 24,
+                          color: '#fff',
+                          marginLeft: 10
+                        }}
+                        src={Gps}
+                        alt=""
+                      />
+                    </Button>
+                  </div>
+                  <Tooltip
+                    id="tooltipA"
+                    placement={'left'}
+                    isOpen={this.state.tooltipOpen}
+                    target={'Tooltip-1'}
+                    toggle={this.handleTooltipOpen}
+                  >
+                    {this.state.textGPS}
+                  </Tooltip>
+                  <FormGroup>
+                    <Label for="phuong">Tìm theo Quận</Label>
+                    <Typeahead
+                      labelKey="quan"
+                      placeholder="Nhập quận"
+                      paginationText="Xem thêm"
+                      emptyLabel="Không có dữ liệu"
+                      onChange={selected => {
+                        this.setState({
+                          quanSelect: ''
+                        });
+                        if (selected.length !== 0) {
+                          this.setState({
+                            zoom: 15,
+                            center: {
+                              lat: selected[0].lat,
+                              lng: selected[0].lng
+                            },
+                            quanSelect: selected[0].quan
+                          });
+                        } else {
                           this.setState({
                             quanSelect: ''
                           });
-                          if (selected.length !== 0) {
-                            this.setState({
-                              zoom: 15,
-                              center: {
-                                lat: selected[0].lat,
-                                lng: selected[0].lng
-                              },
-                              quanSelect: selected[0].quan
-                            });
-                          } else {
-                            this.setState({
-                              quanSelect: ''
-                            });
-                          }
-                        }}
-                        options={uniqueQuan}
-                        selected={this.state.selected}
-                      />
-                    </FormGroup>
+                        }
+                      }}
+                      options={uniqueQuan}
+                      selected={this.state.selected}
+                    />
+                  </FormGroup>
 
-                    <FormGroup>
-                      <Label for="phuong">Tìm theo Phường</Label>
-                      <Typeahead
-                        labelKey="phuong"
-                        placeholder="Nhập phường"
-                        paginationText="Xem thêm"
-                        emptyLabel="Không có dữ liệu"
-                        onChange={selected => {
-                          if (selected.length !== 0) {
-                            this.setState({
-                              zoom: 17,
-                              center: {
-                                lat: selected[0].lat,
-                                lng: selected[0].lng
-                              }
-                            });
-                          }
-                        }}
-                        options={unique(dataQuanSelect, 'phuong')}
-                        selected={this.state.selected}
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label for="tenTruong">Tìm theo trường</Label>
-                      <Typeahead
-                        labelKey="tenTruong"
-                        placeholder="Chọn tên trường"
-                        paginationText="Xem thêm tên trường"
-                        emptyLabel="Không có dữ liệu"
-                        onChange={selected => {
-                          // console.log(selected);
-                          // let pos = ;
-                          if (selected.length !== 0) {
-                            this.setState({
-                              zoom: 20,
-                              center: {
-                                lat: selected[0].lat,
-                                lng: selected[0].lng
-                              },
-                              icon: {
-                                url: iconMarker48
-                              }
-                            });
-                          }
-                        }}
-                        options={this.state.data}
-                        selected={this.state.selected}
-                      />
-                    </FormGroup>
-                    <Button
-                      outline
-                      onClick={this.toggle}
-                      style={{ marginBottom: '1rem' }}
-                    >
-                      Tìm kiếm theo thuộc tính
+                  <FormGroup>
+                    <Label for="phuong">Tìm theo Phường</Label>
+                    <Typeahead
+                      labelKey="phuong"
+                      placeholder="Nhập phường"
+                      paginationText="Xem thêm"
+                      emptyLabel="Không có dữ liệu"
+                      onChange={selected => {
+                        if (selected.length !== 0) {
+                          this.setState({
+                            zoom: 17,
+                            center: {
+                              lat: selected[0].lat,
+                              lng: selected[0].lng
+                            }
+                          });
+                        }
+                      }}
+                      options={unique(dataQuanSelect, 'phuong')}
+                      selected={this.state.selected}
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="tenTruong">Tìm theo trường</Label>
+                    <Typeahead
+                      labelKey="tenTruong"
+                      placeholder="Chọn tên trường"
+                      paginationText="Xem thêm tên trường"
+                      emptyLabel="Không có dữ liệu"
+                      onChange={selected => {
+                        // console.log(selected);
+                        // let pos = ;
+                        if (selected.length !== 0) {
+                          this.setState({
+                            zoom: 20,
+                            center: {
+                              lat: selected[0].lat,
+                              lng: selected[0].lng
+                            },
+                            icon: {
+                              url: iconMarker48
+                            }
+                          });
+                        }
+                      }}
+                      options={this.state.data}
+                      selected={this.state.selected}
+                    />
+                  </FormGroup>
+                  <Button
+                    outline
+                    onClick={this.toggle}
+                    style={{ marginBottom: '1rem' }}
+                  >
+                    Tìm kiếm theo thuộc tính
                   </Button>
-                    <Collapse isOpen={this.state.collapse}>
-                      <Form onSubmit={this.handleSubmit}>
-                        <FormGroup>
-                          <Label for="loaiTruong">Loại trường</Label>
-                          <Typeahead
-                            ref="typeahead1"
-                            paginationText="Xem thêm"
-                            emptyLabel="Không có dữ liệu"
-                            onChange={selected => {
-                              if (selected.length !== 0) {
-                                const newData = data.filter(
-                                  v => v.loaiTruong === selected[0]
-                                );
-                                this.setState({
-                                  data: newData
-                                });
-                              }
-                            }}
-                            options={uLoaiTruong}
-                            selected={this.state.selected}
-                          />
-                        </FormGroup>
+                  <Collapse isOpen={this.state.collapse}>
+                    <Form onSubmit={this.handleSubmit}>
+                      <FormGroup>
+                        <Label for="loaiTruong">Loại trường</Label>
+                        <Typeahead
+                          ref="typeahead1"
+                          paginationText="Xem thêm"
+                          emptyLabel="Không có dữ liệu"
+                          onChange={selected => {
+                            if (selected.length !== 0) {
+                              const newData = data.filter(
+                                v => v.loaiTruong === selected[0]
+                              );
+                              this.setState({
+                                data: newData
+                              });
+                            }
+                          }}
+                          options={uLoaiTruong}
+                          selected={this.state.selected}
+                        />
+                      </FormGroup>
 
-                        <FormGroup>
-                          <Label for="gcn">Giấy chứng nhận</Label>
-                          <Typeahead
-                            ref="typeahead2"
-                            paginationText="Xem thêm"
-                            emptyLabel="Không có dữ liệu"
-                            onChange={selected => {
-                              if (selected.length !== 0) {
-                                const newData = data.filter(
-                                  v => v.giayChungNhan === selected[0]
-                                );
-                                this.setState({
-                                  data: newData
-                                });
-                              }
-                            }}
-                            options={ugiayChungNhan}
-                            selected={this.state.selected}
-                          />
-                        </FormGroup>
+                      <FormGroup>
+                        <Label for="gcn">Giấy chứng nhận</Label>
+                        <Typeahead
+                          ref="typeahead2"
+                          paginationText="Xem thêm"
+                          emptyLabel="Không có dữ liệu"
+                          onChange={selected => {
+                            if (selected.length !== 0) {
+                              const newData = data.filter(
+                                v => v.giayChungNhan === selected[0]
+                              );
+                              this.setState({
+                                data: newData
+                              });
+                            }
+                          }}
+                          options={ugiayChungNhan}
+                          selected={this.state.selected}
+                        />
+                      </FormGroup>
 
-                        <FormGroup>
-                          <Label for="hp">Học phí</Label>
-                          <Typeahead
-                            ref="typeahead3"
-                            paginationText="Xem thêm"
-                            emptyLabel="Không có dữ liệu"
-                            onChange={selected => {
-                              if (selected.length !== 0) {
-                                const newData = data.filter(
-                                  v => v.hocPhi === selected[0]
-                                );
-                                this.setState({
-                                  data: newData
-                                });
-                              }
-                            }}
-                            options={uhocPhi}
-                            selected={this.state.selected}
-                          />
-                        </FormGroup>
+                      <FormGroup>
+                        <Label for="hp">Học phí</Label>
+                        <Typeahead
+                          ref="typeahead3"
+                          paginationText="Xem thêm"
+                          emptyLabel="Không có dữ liệu"
+                          onChange={selected => {
+                            if (selected.length !== 0) {
+                              const newData = data.filter(
+                                v => v.hocPhi === selected[0]
+                              );
+                              this.setState({
+                                data: newData
+                              });
+                            }
+                          }}
+                          options={uhocPhi}
+                          selected={this.state.selected}
+                        />
+                      </FormGroup>
 
-                        <FormGroup>
-                          <Label for="dt">Độ tuổi trẻ nhận giữ</Label>
-                          <Typeahead
-                            ref="typeahead4"
-                            paginationText="Xem thêm"
-                            emptyLabel="Không có dữ liệu"
-                            onChange={selected => {
-                              if (selected.length !== 0) {
-                                const newData = data.filter(
-                                  v => v.doTuoiNhan === selected[0]
-                                );
-                                this.setState({
-                                  data: newData
-                                });
-                              }
-                            }}
-                            options={udoTuoiNhan}
-                            selected={this.state.selected}
-                          />
-                        </FormGroup>
+                      <FormGroup>
+                        <Label for="dt">Độ tuổi trẻ nhận giữ</Label>
+                        <Typeahead
+                          ref="typeahead4"
+                          paginationText="Xem thêm"
+                          emptyLabel="Không có dữ liệu"
+                          onChange={selected => {
+                            if (selected.length !== 0) {
+                              const newData = data.filter(
+                                v => v.doTuoiNhan === selected[0]
+                              );
+                              this.setState({
+                                data: newData
+                              });
+                            }
+                          }}
+                          options={udoTuoiNhan}
+                          selected={this.state.selected}
+                        />
+                      </FormGroup>
 
-                        <FormGroup>
-                          <Label for="tg">Thời gian nhận giữ trẻ</Label>
-                          <Typeahead
-                            ref="typeahead5"
-                            paginationText="Xem thêm"
-                            emptyLabel="Không có dữ liệu"
-                            onChange={selected => {
-                              if (selected.length !== 0) {
-                                const newData = data.filter(
-                                  v => v.thoiGianGiu === selected[0]
-                                );
-                                this.setState({
-                                  data: newData
-                                });
-                              }
-                            }}
-                            options={uthoiGianGiu}
-                            selected={this.state.selected}
-                          />
-                        </FormGroup>
-                        <Button style={{ marginBottom: 25 }} color="primary">
-                          Tìm lại
+                      <FormGroup>
+                        <Label for="tg">Thời gian nhận giữ trẻ</Label>
+                        <Typeahead
+                          ref="typeahead5"
+                          paginationText="Xem thêm"
+                          emptyLabel="Không có dữ liệu"
+                          onChange={selected => {
+                            if (selected.length !== 0) {
+                              const newData = data.filter(
+                                v => v.thoiGianGiu === selected[0]
+                              );
+                              this.setState({
+                                data: newData
+                              });
+                            }
+                          }}
+                          options={uthoiGianGiu}
+                          selected={this.state.selected}
+                        />
+                      </FormGroup>
+                      <Button style={{ marginBottom: 25 }} color="primary">
+                        Tìm lại
                       </Button>
-                      </Form>
-                    </Collapse>
-
-
-                  </div>
-                )}
+                    </Form>
+                  </Collapse>
+                </div>
+              )}
             </Col>
 
             <Col sm="8" style={{ padding: 0 }}>
               {this.state.directions ? (
                 <Directions directions={this.state.directions} />
               ) : (
-                  <MapComponent
-                    zoomRef={this.zoomRef}
-                    zoom={this.state.zoom}
-                    center={this.state.center}
-                    data={this.state.data}
-                    isMarkerShown={this.state.isMarkerShown}
-                    onMarkerClick={this.handleMarkerClick}
-                    onZoomChanged={this.onZoomChanged}
-                    icon={this.state.icon}
-                    changeCircle={this.state.changeCircle}
-                  />
-                )}
+                <MapComponent
+                  zoomRef={this.zoomRef}
+                  zoom={this.state.zoom}
+                  center={this.state.center}
+                  data={this.state.data}
+                  isMarkerShown={this.state.isMarkerShown}
+                  onMarkerClick={this.handleMarkerClick}
+                  onZoomChanged={this.onZoomChanged}
+                  icon={this.state.icon}
+                  changeCircle={this.state.changeCircle}
+                />
+              )}
             </Col>
           </Row>
         </Container>

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Form, Input, Col, FormGroup, Label } from 'reactstrap';
-import firebase from '../utils/firebase';
+import firebase from './utils/firebase';
 const db = firebase.database();
 
-class AddLocation extends React.Component {
+class AddSchoolAnonymous extends React.Component {
   state = { v: {}, update: false };
 
   handleChange = e => {
@@ -25,17 +25,17 @@ class AddLocation extends React.Component {
     }, 3000);
     e.preventDefault();
     db
-      .ref('data')
+      .ref('dataAny')
       .push(this.state.v)
       .then(result => this.setState({ update: true }))
       .catch(err => console.log(err));
   };
 
   render() {
-    const { modal, toggle, className } = this.props;
+    const { modal, toggle } = this.props;
     return (
       <div>
-        <Modal size="lg" isOpen={modal} toggle={toggle} className={className}>
+        <Modal size="lg" isOpen={modal} toggle={toggle}>
           <ModalHeader toggle={this.toggle}>Thêm trường mới</ModalHeader>
           <Form onSubmit={this.handleSubmit}>
             <ModalBody>
@@ -234,4 +234,4 @@ class AddLocation extends React.Component {
   }
 }
 
-export default AddLocation;
+export default AddSchoolAnonymous;
