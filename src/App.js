@@ -9,8 +9,7 @@ import { Typeahead } from 'react-bootstrap-typeahead'; // ES2015
 import { Collapse, Form, Input } from 'reactstrap';
 import { ListGroup, ListGroupItem, Tooltip } from 'reactstrap';
 import { Circle } from 'react-google-maps';
-
-import AddSchoolAnonymous from './AddSchoolAnonymous';
+import AddSchoolMarker from './AddSchoolMarker';
 // icons
 import iconMarker16 from './icons/icon_marker16.png';
 import iconMarker24 from './icons/icon_marker24.png';
@@ -35,6 +34,7 @@ const MapComponent = compose(
     center={props.center}
     zoom={props.zoom}
     onZoomChanged={props.onZoomChanged}
+    onClick={props.handleAddMarker}
     options={{
       styles: [
         {
@@ -63,7 +63,7 @@ const MapComponent = compose(
         {props.changeCircle && (
           <Circle
             center={props.center}
-            radius={1000}
+            radius={3000}
             options={{
               strokeColor: 'rgb(37, 6, 160)',
               strokeOpacity: 0.8,
@@ -104,17 +104,15 @@ class App extends React.PureComponent {
 
       tooltipOpen: false,
       textGPS: 'Không có địa chỉ',
-      modalAdd: false
+      modalAdd: false,
+      dataclickmap: {
+        
+      }
     };
     this.myRef = React.createRef();
     this.myRef2 = React.createRef();
     this.zoomRef = React.createRef();
   }
-  toggleAdd = () => {
-    this.setState({
-      modalAdd: !this.state.modalAdd
-    });
-  };
 
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
@@ -132,17 +130,19 @@ class App extends React.PureComponent {
     //     data: new_data
     //   });
     // });
-    db.ref('data').once('value').then(snapshot => {
-      let new_data = [];
-      snapshot.forEach(childSnapshot => {
-        const childData = childSnapshot.val();
-        new_data.push(childData);
+    db
+      .ref('data')
+      .once('value')
+      .then(snapshot => {
+        let new_data = [];
+        snapshot.forEach(childSnapshot => {
+          const childData = childSnapshot.val();
+          new_data.push(childData);
+        });
+        this.setState({
+          data: new_data
+        });
       });
-      this.setState({
-        data: new_data
-      });
-    });
-
   }
   handleTooltipOpen = () => {
     this.setState({
@@ -387,6 +387,20 @@ class App extends React.PureComponent {
       console.log("Browser doesn't support Geolocation");
     }
   };
+
+  handleAddMarker = e => {
+    if (e.latLng) {
+      this.setState({
+        dataclickmap: {
+          lat: e.latLng.lat(),
+          lng: e.latLng.lng()
+        }
+      })
+    }
+    this.setState({
+      modalAdd: !this.state.modalAdd
+    });
+  };
   render() {
     const { data, user } = this.state;
     // const route = this.state.directions.routes[0].legs[0];
@@ -513,18 +527,7 @@ class App extends React.PureComponent {
                       justifyContent: 'space-between'
                     }}
                   >
-                    <Button
-                      color="success"
-                      style={{ marginBottom: '20px' }}
-                      onClick={this.toggleAdd}
-                    >
-                      Thêm trường mới
-                    </Button>
-
-                    <AddSchoolAnonymous
-                      modal={this.state.modalAdd}
-                      toggle={this.toggleAdd}
-                    />
+                    <div>Tìm theo vị trí của bạn</div>
                     <Button
                       onClick={this.handleGps2}
                       style={{ marginBottom: '20px' }}
@@ -769,10 +772,16 @@ class App extends React.PureComponent {
                   onZoomChanged={this.onZoomChanged}
                   icon={this.state.icon}
                   changeCircle={this.state.changeCircle}
+                  handleAddMarker={this.handleAddMarker}
                 />
               )}
             </Col>
           </Row>
+          <AddSchoolMarker
+            modal={this.state.modalAdd}
+            toggle={this.handleAddMarker}
+            dataAddMarker={this.state.dataclickmap}
+          />
         </Container>
       </div>
     );

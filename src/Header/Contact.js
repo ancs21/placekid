@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Form, Input, Col, FormGroup, Label } from 'reactstrap';
-
+import AddSchoolAnonymous from '../AddSchoolAnonymous';
 import firebase from '../utils/firebase';
 const db = firebase.database();
 
@@ -12,7 +12,13 @@ class Contact extends React.Component {
       tieude: '',
       noidung: ''
     },
-    send: false
+    send: false,
+    modalAdd: false
+  };
+  toggleAdd = () => {
+    this.setState({
+      modalAdd: !this.state.modalAdd
+    });
   };
   handleChange = e => {
     const value = this.state.value;
@@ -40,7 +46,6 @@ class Contact extends React.Component {
         }, 3000);
       })
       .catch(err => console.log(err));
-      
   };
 
   render() {
@@ -89,6 +94,16 @@ class Contact extends React.Component {
             </FormGroup>
           </ModalBody>
           <ModalFooter>
+            <Button
+              color="success"
+              onClick={this.toggleAdd}
+            >
+              Thêm trường mới
+            </Button>
+            <AddSchoolAnonymous
+              modal={this.state.modalAdd}
+              toggle={this.toggleAdd}
+            />
             {this.state.send && <div>Gửi thành công</div>}
             <Button color="primary">Gửi yêu cầu</Button>{' '}
           </ModalFooter>

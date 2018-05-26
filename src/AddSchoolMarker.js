@@ -4,7 +4,7 @@ import { Form, Input, Col, FormGroup, Label } from 'reactstrap';
 import firebase from './utils/firebase';
 const db = firebase.database();
 
-class AddSchoolAnonymous extends React.Component {
+class AddSchoolMarker extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -38,9 +38,10 @@ class AddSchoolAnonymous extends React.Component {
   };
 
   render() {
-    const { modal, toggle } = this.props;
+    const { modal, toggle, dataAddMarker } = this.props;
     return (
       <div>
+        {dataAddMarker && (
           <Modal size="lg" isOpen={modal} toggle={toggle}>
             <ModalHeader toggle={this.toggle}>Thêm trường mới</ModalHeader>
             <Form onSubmit={this.handleSubmit}>
@@ -60,6 +61,7 @@ class AddSchoolAnonymous extends React.Component {
                   <Label sm={3}>Latitude</Label>
                   <Col sm={9}>
                     <Input
+                      value={dataAddMarker.lat}
                       onChange={this.handleChange1}
                       type="text"
                       name="lat"
@@ -71,6 +73,7 @@ class AddSchoolAnonymous extends React.Component {
                   <Label sm={3}>Longtitude</Label>
                   <Col sm={9}>
                     <Input
+                      value={dataAddMarker.lng}
                       onChange={this.handleChange}
                       type="text"
                       name="lng"
@@ -251,9 +254,10 @@ class AddSchoolAnonymous extends React.Component {
               </ModalFooter>
             </Form>
           </Modal>
+        )}
       </div>
     );
   }
 }
 
-export default AddSchoolAnonymous;
+export default AddSchoolMarker;
